@@ -1,0 +1,394 @@
+[
+  {
+    "page": "/",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=3lb4g",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=3lb4g",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=mv634",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=mv634",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/faq",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=1nkgq",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/faq",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=1nkgq",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/input",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=1kd6m",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/input",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=1kd6m",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/input",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=1kd6m",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/button",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=1kupl",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/button",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=1kupl",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/button",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=1kupl",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/dropdown",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=1jzsb",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/dropdown",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=1jzsb",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/dropdown",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=1jzsb",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/multiselect",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=13ons",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/multiselect",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=13ons",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/multiselect",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=13ons",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/alert",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=3mbfi",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/alert",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=3mbfi",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/alert",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=3mbfi",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/radio",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=r5s1y",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/radio",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=r5s1y",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/radio",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=r5s1y",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/drag",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=1lvkq",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/drag",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=1lvkq",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/drag",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=1lvkq",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/wait",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=1kemh",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/wait",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=1kemh",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/wait",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=1kemh",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/simple-table",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=1edb0",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/simple-table",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=1edb0",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/simple-table",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=1edb0",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/advanced-table",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=x7o9d",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/advanced-table",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=x7o9d",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/advanced-table",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=x7o9d",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/form",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=vavss",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/form",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=vavss",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/form",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=vavss",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/form",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/testing-terms-conditions?_rsc=vavss",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/calendar",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=odttf",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/calendar",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=odttf",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/calendar",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=odttf",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/slider",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=1035r",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/slider",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=1035r",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/slider",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=1035r",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/uploadFile",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=jxrbl",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/uploadFile",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=jxrbl",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/uploadFile",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=jxrbl",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/dragAndDrop",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=dp78k",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/dragAndDrop",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=dp78k",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/dragAndDrop",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=dp78k",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/window",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/?_rsc=j0o8j",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/window",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/components?_rsc=j0o8j",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/window",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/faq?_rsc=j0o8j",
+    "resourceType": "fetch",
+    "postData": null
+  },
+  {
+    "page": "/components/window",
+    "method": "GET",
+    "url": "https://www.automationplayground.dev/new-tab-page?_rsc=j0o8j",
+    "resourceType": "fetch",
+    "postData": null
+  }
+]
