@@ -38,9 +38,17 @@ test.describe('Multiselect component', () => {
 
     const MAX_CHIPS = 20;
     for (let i = 0; i < MAX_CHIPS; i++) {
-      const chipCount = await form3.locator('.icon_cancel').count();
-      if (chipCount === 0) break;
+      const chipCountBefore = await form3.locator('.icon_cancel').count();
+      if (chipCountBefore === 0) break;
+
       await form3.locator('.icon_cancel').first().click();
+
+      // Wait for the DOM to actually drop to one fewer chip before the next
+      // click, instead of firing clicks blindly — Firefox in particular was
+      // slower to re-render here, so the loop could outrun the removals
+      // and leave leftover chips behind. Timeout bumped since this gets
+      // flakier when running under full parallel load (less CPU per browser).
+      await expect(form3.locator('.icon_cancel')).toHaveCount(chipCountBefore - 1, { timeout: 10000 });
     }
 
     await expect(form3.locator('.chip')).toHaveCount(0);
