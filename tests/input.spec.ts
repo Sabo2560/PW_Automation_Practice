@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Input component', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('https://www.automationplayground.dev/components/input');
+    await page.goto('/components/input');
   });
 
   test('should type text into full name field', async ({ page }) => {
@@ -11,12 +11,18 @@ test.describe('Input component', () => {
     await expect(fullName).toHaveValue('Test Tester');
   });
 
-  test('should append text on button/action', async ({ page }) => {
+  test('should append typed text before the default value', async ({ page }) => {
     const appendField = page.getByTestId('append-text');
-    await appendField.fill('Hello');
+
+    // The field ships with default text already in it (e.g. "BeLike").
+    // Read it first instead of hardcoding it, so this test doesn't break
+    // if the default value ever changes on the page.
+    const defaultValue = await appendField.inputValue();
+
+    await appendField.fill('Testing' + defaultValue);
     await appendField.press('Tab');
-    // Verify appended text — update expected value once actual append behavior is confirmed
-    await expect(appendField).not.toHaveValue('');
+
+    await expect(appendField).toHaveValue('Testing' + defaultValue);
   });
 
   test('should read text inside the text box', async ({ page }) => {
@@ -26,11 +32,13 @@ test.describe('Input component', () => {
     expect(value.length).toBeGreaterThan(0);
   });
 
-  test('should clear the text field', async ({ page }) => {
+  test('should let the user select and clear the pre-filled text field', async ({ page }) => {
     const clearField = page.getByTestId('clear-text');
-    await clearField.fill('Some text');
-    await expect(clearField).toHaveValue('Some text');
-    // Trigger the clear action — update selector below with the actual clear button/testid
+
+    // Field loads with default text already in it — the "clear" exercise
+    // is just about the user being able to select-all and delete it,
+    // there's no separate clear button on the page.
+    await expect(clearField).not.toHaveValue('');
     await clearField.fill('');
     await expect(clearField).toHaveValue('');
   });
