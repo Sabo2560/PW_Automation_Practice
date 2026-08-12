@@ -4,6 +4,11 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  schedule:
+    # Runs daily at 06:00 UTC. GitHub Actions cron is always UTC —
+    # adjust the hour if you want it to land at a specific local time.
+    - cron: '0 6 * * *'
+  workflow_dispatch: # lets you also trigger it manually from the Actions tab
 jobs:
   test:
     timeout-minutes: 60
