@@ -19,9 +19,15 @@ test.describe('Home Page - Content Sections and External Links', () => {
   test('\'Got a feature in Mind?\' section displays expected copy', async ({ page }) => {
     // 1. Navigate to '/' and scroll to the 'Got a feature in Mind?' section
     await page.goto('/');
-    const featureSection = page.locator('section').filter({ hasText: 'Got a feature in Mind?Drop us' });
-    await expect(page.getByRole('heading', { name: 'Got a feature in Mind?', level: 2 })).toBeVisible();
-    await expect(page.getByText('Drop us a message — we’re always open to improvements and experiments!')).toBeVisible();
+    // Scoping by the heading itself instead of matching concatenated text —
+    // the original selector depended on the heading and paragraph text
+    // being directly adjacent with no whitespace between them in the DOM,
+    // which breaks on any markup/whitespace change even if the content is fine.
+    const featureSection = page.locator('section').filter({
+      has: page.getByRole('heading', { name: 'Got a feature in Mind?' }),
+    });
+    await expect(featureSection.getByRole('heading', { name: 'Got a feature in Mind?', level: 2 })).toBeVisible();
+    await expect(featureSection.getByText('Drop us a message — we’re always open to improvements and experiments!')).toBeVisible();
     await expect(featureSection.getByRole('img')).toBeVisible();
   });
 
@@ -35,29 +41,24 @@ test.describe('Home Page - Content Sections and External Links', () => {
     await expect(contactLink).toHaveAttribute('href', 'mailto:qa.automation.playground@gmail.com');
   });
 
-  test('\'Buy Me A Coffee\' external link opens correct destination in a new tab', async ({ page, context }) => {
-    // 1. Navigate to '/', scroll to the 'Like the project?' section, and verify the 'Buy Me A Coffee' image link's href and target attributes before interacting
+  test('\'Buy Me A Coffee\' link has correct destination and opens in a new tab', async ({ page }) => {
+    // Checking the attributes only, not actually navigating to the live
+    // external site — see test plan notes on why the click-through was
+    // dropped from the automated suite (third-party site reliability
+    // shouldn't be able to fail our CI).
     await page.goto('/');
     const coffeeLink = page.getByRole('link', { name: 'Buy Me A Coffee' });
     await expect(coffeeLink).toHaveAttribute('href', 'https://www.buymeacoffee.com/automationplayground');
     await expect(coffeeLink).toHaveAttribute('target', '_blank');
-
-    // 2. Click the 'Buy Me A Coffee' link and capture the newly opened page/tab
-    const [newPage] = await Promise.all([
-      context.waitForEvent('page'),
-      coffeeLink.click(),
-    ]);
-    await newPage.waitForURL(/buymeacoffee\.com\/automationplayground/);
-    expect(newPage.url()).toMatch(/^https:\/\/(www\.)?buymeacoffee\.com\/automationplayground/);
-    expect(page.url()).toContain('automationplayground.dev/');
   });
 
   test('No broken links: all home page links respond successfully', async ({ page }) => {
-    // 1. Navigate to '/' and collect all anchor tag hrefs on the page (internal: '/', '/components', '/faq', '#learn-more'; external: buymeacoffee.com; mailto is excluded from HTTP checks)
+    // 1. Navigate to '/' and collect all anchor tag hrefs on the page
     await page.goto('/');
     const links = page.locator('a');
     const count = await links.count();
-    const hrefs: string[] = [];
+    const hrefs = new Set<string>();
+
     for (let i = 0; i < count; i++) {
       const href = await links.nth(i).getAttribute('href');
       expect(href).not.toBeNull();
@@ -65,17 +66,26 @@ test.describe('Home Page - Content Sections and External Links', () => {
       expect(href).not.toBe('#');
       expect(href).not.toBe('javascript:void(0)');
       if (href && !href.startsWith('mailto:')) {
-        hrefs.push(href);
+        hrefs.add(href);
       }
     }
 
-    const internalPaths = ['/', '/components', '/faq'];
-    for (const path of internalPaths) {
-      const response = await page.request.get(path);
-      expect(response.status()).toBeLessThan(400);
-    }
+    expect(hrefs.size).toBeGreaterThan(0);
 
-    const externalResponse = await page.request.head('https://www.buymeacoffee.com/automationplayground');
-    expect(externalResponse.status()).toBeLessThan(400);
+    // Actually checking every link we collected — the original version
+    // gathered hrefs above and then discarded them in favor of a hardcoded
+    // list, so a new/changed link on the page could silently go unchecked.
+    for (const href of hrefs) {
+      if (href.startsWith('http')) {
+        const response = await page.request.head(href).catch(() =>
+          // Some external sites reject HEAD requests (405) — fall back to GET
+          page.request.get(href)
+        );
+        expect(response.status(), `${href} responded with an error status`).toBeLessThan(400);
+      } else {
+        const response = await page.request.get(href);
+        expect(response.status(), `${href} responded with an error status`).toBeLessThan(400);
+      }
+    }
   });
 });

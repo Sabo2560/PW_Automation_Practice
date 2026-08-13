@@ -21,15 +21,16 @@ test.describe('Home Page - Responsive and Accessibility Checks', () => {
     await expect(page.getByText('© 2026 Automation Playground.')).toBeVisible();
   });
 
-  test('Home page renders correctly on tablet and desktop viewports', async ({ page }) => {
-    // 1. Set viewport to tablet size (e.g. 768x1024) and navigate to '/'; then repeat with a desktop size (e.g. 1440x900)
+  test('Home page renders correctly on tablet viewport', async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'The Library of Components for Automation Testing' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Browse all components' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Get started' })).toBeVisible();
     await expect(page.getByText('© 2026 Automation Playground.')).toBeVisible();
+  });
 
+  test('Home page renders correctly on desktop viewport', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'The Library of Components for Automation Testing' })).toBeVisible();
@@ -58,8 +59,13 @@ test.describe('Home Page - Responsive and Accessibility Checks', () => {
     }
   });
 
-  test('Home page heading hierarchy is valid', async ({ page }) => {
-    // 1. Navigate to '/' and inspect the document heading structure
+  test('Home page headings are present with correct text and levels', async ({ page }) => {
+    // Note: this checks that each expected heading exists with the right
+    // level — it does NOT validate overall document hierarchy (e.g. only
+    // one h1 per page). The page actually has two <h1>s (branding +
+    // hero heading), which is a real accessibility finding — flagged
+    // separately in the test plan rather than asserted here as a failure,
+    // since fixing it is a site change, not a test change.
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Automation Playground', level: 1 })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'The Library of Components for Automation Testing', level: 1 })).toBeVisible();

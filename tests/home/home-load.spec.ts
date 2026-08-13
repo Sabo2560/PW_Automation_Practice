@@ -4,20 +4,23 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Home Page - Load and Branding', () => {
-  test('Home page loads with correct title, heading, and branding', async ({ page }) => {
-    // 1. Navigate to the base URL '/'
+  test('page loads with correct title and branding link', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveTitle('Automation playground');
     const brandingLink = page.getByRole('link', { name: 'Automation Playground' });
     await expect(brandingLink).toBeVisible();
     await expect(brandingLink).toHaveAttribute('href', '/');
+  });
 
-    // 2. Verify the hero section is visible
+  test('hero section displays heading, copy, and CTA', async ({ page }) => {
+    await page.goto('/');
     await expect(page.getByRole('heading', { name: 'The Library of Components for Automation Testing', level: 1 })).toBeVisible();
     await expect(page.getByText('Sharpen Your Automation Skills Through Real Examples')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Browse all components' })).toBeVisible();
+  });
 
-    // 3. Verify the footer is visible at the bottom of the page
+  test('footer displays copyright notice', async ({ page }) => {
+    await page.goto('/');
     await expect(page.getByText('© 2026 Automation Playground.')).toBeVisible();
     await expect(page.getByText('All rights reserved.')).toBeVisible();
   });
