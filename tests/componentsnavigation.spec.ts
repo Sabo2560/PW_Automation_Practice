@@ -35,8 +35,7 @@ test.describe('Components listing navigation', () => {
     for (const href of hrefs) {
       // Wrapping each iteration in test.step() so the HTML report shows
       // per-component pass/fail instead of one opaque line for the whole
-      // loop — if "components/slider" breaks, the report says so directly
-      // instead of us having to dig through logs to find which one failed.
+      // loop !
       await test.step(`navigate to /${href} and back`, async () => {
         // Re-visiting the listing page each loop instead of relying on the
         // Back button's return trip — keeps each iteration independent, so
@@ -49,8 +48,8 @@ test.describe('Components listing navigation', () => {
         // Using keyboard activation instead of a mouse click here — the last
         // card in the grid sits right where the page footer overlaps it at
         // this viewport size, which was silently swallowing real mouse clicks.
-        // Focus + Enter activates the link without depending on click coordinates.
         await cardLink.focus();
+        // Focus + Enter activates the link without depending on click coordinates.
         await Promise.all([
           page.waitForURL(`/${href}`),
           page.keyboard.press('Enter'),
