@@ -219,12 +219,10 @@ One suite per component, once individually planned:
 | Button | Click, disabled state, loading state, double-click prevention |
 | Dropdown | Open/close, select option, keyboard navigation, default value |
 | Multiselect | Select multiple, deselect, select all/none, search/filter if present |
-| Alert | Trigger alert, verify message/type (success/error/warning), dismiss |
 | Radio | Select option, checkbox toggle, group exclusivity, default state |
 | Drag | Drag element to target, verify final position/state |
 | Wait | Trigger action, assert alert appears within expected async delay |
 | Simple Table | Row count, column headers, sorting (if present), cell content |
-| Advanced Table | Sorting, filtering, pagination, row selection, search |
 | Form | Fill all fields, submit valid data, submit invalid data (validation errors), reset |
 | Calendar | Pick date, navigate months/years, disabled dates, range selection if present |
 | Slider | Drag to value, keyboard arrow adjustment, min/max bounds |
@@ -232,13 +230,129 @@ One suite per component, once individually planned:
 | Drag and Drop | Move item between zones, cancel drop outside target, multiple items |
 | Window | Trigger new window/tab, verify content, verify original window state |
 
-## 9. FAQ Page — Not Yet Planned
+Fully planned separately (see linked doc): Advanced Table (`specs/advanced-table.plan.md`).
+
+## 9. Alert Component (`/components/alert`) — Partially Implemented
+
+**Seed:** `tests/seed.spec.ts`
+
+The component is purely client-side: no XHR/fetch requests fire on any trigger (verified via network inspection), so there is no API-level coverage for this component — all scenarios are dialog/DOM assertions. Four trigger buttons exist on the page, each identified by `data-testid`: `button-simple-alert`, `button-confirm-alert`, `button-prompt-alert`, `button-sweet-alert`. On fresh page load, no result text is visible for any trigger, and the prompt's result paragraph does not exist in the DOM at all until a prompt has been submitted at least once in that page instance — a reload fully resets this state.
+
+An implemented suite already exists at `tests/components/alert.spec.ts` (confirmed healthy — 20 executions across chromium/firefox/webkit, zero flakes, reviewed by the test-healer agent). Scenarios below are tagged **STATUS: implemented** where covered, or **GAP** with a priority where not.
+
+#### 9.1. Simple browser `alert()` — trigger and accept
+
+**STATUS:** Implemented (`tests/components/alert.spec.ts`).
+
+**File:** `tests/components/alert.spec.ts`
+
+**Steps:**
+  1. Navigate to '/components/alert', register a dialog handler before clicking, then click the `button-simple-alert` trigger
+    - expect: A native dialog of type 'alert' appears; accepting it succeeds
+  2. GAP (Low priority, enhancement to existing test). In addition to asserting dialog type, also assert the dialog's exact message text, confirmed via exploration to be: 'Hey! Welcome to Automation Playground!'
+
+#### 9.2. Native `confirm()` dialog — dismiss path (message content)
+
+**STATUS:** Implemented (`tests/components/alert.spec.ts`).
+
+**File:** `tests/components/alert.spec.ts`
+
+**Steps:**
+  1. Navigate to '/components/alert', register a dialog handler, click `button-confirm-alert`, and dismiss the dialog
+    - expect: The dialog message equals exactly 'Are you happy with Automation Playground?'
+
+#### 9.3. Native `confirm()` dialog — accept path
+
+**STATUS:** GAP — High priority. Only the dismiss path is currently tested; the accept (OK) path is not.
+
+**File:** `tests/components/alert.spec.ts`
+
+**Steps:**
+  1. Navigate to '/components/alert', register a dialog handler, click `button-confirm-alert`, and accept() the dialog instead of dismissing it
+    - expect: Confirmed via exploration: accepting produces no visible on-page text change (unlike the prompt flow) — the test should explicitly assert that no new result text (e.g. no element containing 'You entered' or similar) appears on the page after accepting, to lock in this documented behavior rather than leaving it unverified
+
+#### 9.4. Native `prompt()` dialog — accept with typed text
+
+**STATUS:** Implemented (`tests/components/alert.spec.ts`).
+
+**File:** `tests/components/alert.spec.ts`
+
+**Steps:**
+  1. Navigate to '/components/alert', register a dialog handler, click `button-prompt-alert`, and accept the dialog with typed text (e.g. 'Saad Tested')
+    - expect: The dialog type is 'prompt'
+    - expect: The page displays 'You entered: Saad Tested' after accepting
+
+#### 9.5. Native `prompt()` dialog — cancel/dismiss path
+
+**STATUS:** GAP — High priority (data-integrity risk, non-obvious behavior).
+
+**File:** `tests/components/alert.spec.ts`
+
+**Steps:**
+  1. Navigate to '/components/alert', register a dialog handler, click `button-prompt-alert`, and dismiss (cancel) the dialog instead of accepting
+    - expect: Confirmed via exploration: the page displays 'You entered: No name provided.' — cancelling still produces result text (not an absence of text, and not identical wording to a typed name), which is surprising and worth locking in with an explicit assertion
+
+#### 9.6. Native `prompt()` dialog — accept with empty string
+
+**STATUS:** GAP — High priority (boundary/edge case).
+
+**File:** `tests/components/alert.spec.ts`
+
+**Steps:**
+  1. Navigate to '/components/alert', register a dialog handler, click `button-prompt-alert`, and accept the dialog with an empty string (no text typed)
+    - expect: Confirmed via exploration: this produces the exact same text as the cancel path, 'You entered: No name provided.' — NOT 'You entered: ' as might naively be assumed — the component treats an empty accepted value identically to a cancelled prompt, which is a non-obvious equivalence worth asserting explicitly
+
+#### 9.7. Custom SweetAlert modal — trigger and confirm via 'Yes' button
+
+**STATUS:** Implemented (`tests/components/alert.spec.ts`).
+
+**File:** `tests/components/alert.spec.ts`
+
+**Steps:**
+  1. Navigate to '/components/alert' and click `button-sweet-alert` (a custom in-page modal, not a native browser dialog)
+    - expect: Heading 'Error!' and text 'Do you want to continue?' become visible
+  2. Click the 'Yes' button
+    - expect: The 'Error!' heading is no longer visible (web-first `not.toBeVisible()` assertion, tolerant of any fade/transition)
+
+#### 9.8. Custom SweetAlert modal — dismiss via Escape key
+
+**STATUS:** GAP — Medium priority.
+
+**File:** `tests/components/alert.spec.ts`
+
+**Steps:**
+  1. Navigate to '/components/alert', click `button-sweet-alert` to open the modal, then press the Escape key
+    - expect: The modal closes (heading 'Error!' is no longer visible)
+
+#### 9.9. Custom SweetAlert modal — dismiss via outside/backdrop click
+
+**STATUS:** GAP — Medium priority.
+
+**File:** `tests/components/alert.spec.ts`
+
+**Steps:**
+  1. Navigate to '/components/alert', click `button-sweet-alert` to open the modal, then click outside the modal's popup area (on the backdrop)
+    - expect: The modal closes (heading 'Error!' is no longer visible)
+
+**Note:** confirmed via DOM inspection that the SweetAlert modal has no 'No'/Cancel button at all — only 'Yes' exists — so no separate 'No'-button-click scenario applies here.
+
+#### 9.10. All four alert triggers are independent and do not interfere with each other
+
+**STATUS:** GAP — Low priority (regression-safety/sequencing check).
+
+**File:** `tests/components/alert.spec.ts`
+
+**Steps:**
+  1. On a single fresh page load, trigger each of the four alert types in sequence (simple, confirm, prompt, SweetAlert), resolving each before triggering the next
+    - expect: Each trigger behaves identically to when exercised in isolation — no leaked dialog handlers, no stale modal state, no cross-contamination of result text between triggers
+
+## 10. FAQ Page — Not Yet Planned
 
 - Page loads
 - FAQ items expand/collapse (accordion) if present
 - Content matches expected copy
 
-## 10. API Testing — Not Yet Planned
+## 11. API Testing — Not Yet Planned
 
 No public API docs exist. Before writing API tests:
 1. Open each component page with DevTools → Network tab open.
@@ -253,7 +367,7 @@ For each component with backend interaction (likely: Form, Advanced Table, Uploa
 - Verify UI reflects API response (success/error states)
 - Negative cases: malformed payload, server error simulation via `page.route()` mocking
 
-## 11. Out of Scope
+## 12. Out of Scope
 
 - Payment/donation flow completion on Buy Me a Coffee (external, 3rd-party — home page only verifies the outbound link target, not the checkout flow)
 - Email client behavior (mailto link — home page only verifies the href, does not send mail)
