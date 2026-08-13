@@ -1,0 +1,58 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link [ref=e4] [cursor=pointer]:
+        - /url: /
+        - heading "Automation Playground" [level=1] [ref=e5]
+      - navigation [ref=e7]:
+        - link "Home" [ref=e8] [cursor=pointer]:
+          - /url: /
+        - link "Components" [ref=e9] [cursor=pointer]:
+          - /url: /components
+        - link "F.A.Q" [ref=e10] [cursor=pointer]:
+          - /url: /faq
+  - main [ref=e11]:
+    - generic [ref=e12]:
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - heading "The Library of Components for Automation Testing" [level=1] [ref=e16]
+          - paragraph [ref=e17]: Sharpen Your Automation Skills Through Real Examples
+          - link "Browse all components" [ref=e19] [cursor=pointer]:
+            - /url: /components
+        - link "Scroll down" [ref=e21] [cursor=pointer]:
+          - /url: "#learn-more"
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - heading "Automation newbie?" [level=2] [ref=e26]:
+            - generic [ref=e27]: Automation
+            - generic [ref=e28]: newbie?
+          - paragraph [ref=e29]: Automation Playground is a testing space for new automation engineers and anyone curious about frameworks. Whether you're a beginner or a pro, build with confidence. To run tests, make sure your preferred automation framework is installed locally.
+          - link "Get started" [ref=e31] [cursor=pointer]:
+            - /url: /components
+        - img "Automation Testing Illustration" [ref=e33]
+      - generic [ref=e34]:
+        - img "Automation Testing Illustration" [ref=e36]
+        - generic [ref=e37]:
+          - heading "Got a feature in Mind?" [level=2] [ref=e38]
+          - paragraph [ref=e40]:
+            - generic [ref=e41]: Drop us a message — we’re always open to improvements and experiments!
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - heading "Like the project?" [level=2] [ref=e44]
+          - paragraph [ref=e45]: Feedback or coffee — both help us build better, faster!
+        - generic [ref=e46]:
+          - generic [ref=e54]:
+            - paragraph [ref=e55]: Contact us at
+            - link "qa.automation.playground@gmail.com" [ref=e56] [cursor=pointer]:
+              - /url: mailto:qa.automation.playground@gmail.com
+          - generic [ref=e57]:
+            - img "buy me a coffee" [ref=e58]
+            - generic [ref=e59]: OR
+            - link [ref=e60] [cursor=pointer]:
+              - /url: https://www.buymeacoffee.com/automationplayground
+              - img "Buy Me A Coffee" [ref=e61]
+  - contentinfo [ref=e62]:
+    - paragraph [ref=e63]:
+      - generic [ref=e64]: © 2026 Automation Playground.
+      - generic [ref=e65]: All rights reserved.
+  - alert [ref=e66]

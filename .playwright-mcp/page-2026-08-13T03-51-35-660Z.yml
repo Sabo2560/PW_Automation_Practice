@@ -1,0 +1,72 @@
+- generic:
+  - banner:
+    - generic:
+      - link:
+        - /url: /
+        - heading [level=1]: Automation Playground
+      - generic:
+        - button [expanded]
+  - main:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - heading [level=1]: The Library of Components for Automation Testing
+            - paragraph: Sharpen Your Automation Skills Through Real Examples
+            - generic:
+              - link:
+                - /url: /components
+                - generic: Browse all components
+          - link:
+            - /url: "#learn-more"
+      - generic:
+        - generic:
+          - heading [level=2]:
+            - generic: Automation
+            - generic: newbie?
+          - paragraph: Automation Playground is a testing space for new automation engineers and anyone curious about frameworks. Whether you're a beginner or a pro, build with confidence. To run tests, make sure your preferred automation framework is installed locally.
+          - generic:
+            - link:
+              - /url: /components
+              - text: Get started
+      - generic:
+        - generic:
+          - heading [level=2]:
+            - generic: Got a feature in Mind?
+          - paragraph:
+            - generic: Drop us a message — we’re always open to improvements and experiments!
+      - generic:
+        - generic:
+          - heading [level=2]: Like the project?
+          - paragraph: Feedback or coffee — both help us build better, faster!
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - paragraph: Contact us at
+                  - link:
+                    - /url: mailto:qa.automation.playground@gmail.com
+                    - text: qa.automation.playground@gmail.com
+          - generic:
+            - generic: OR
+            - link:
+              - /url: https://www.buymeacoffee.com/automationplayground
+  - contentinfo:
+    - paragraph:
+      - generic: © 2026 Automation Playground.
+      - generic: All rights reserved.
+  - alert
+  - dialog [ref=e66]:
+    - heading "Navigation Menu" [level=2] [ref=e68]
+    - link [ref=e70] [cursor=pointer]:
+      - /url: /
+      - heading "Automation Playground" [level=1] [ref=e71]
+    - navigation [ref=e72]:
+      - link "Home" [ref=e73] [cursor=pointer]:
+        - /url: /
+      - link "Components" [ref=e74] [cursor=pointer]:
+        - /url: /components
+      - link "F.A.Q" [ref=e75] [cursor=pointer]:
+        - /url: /faq
+    - button "Close" [active] [ref=e76] [cursor=pointer]

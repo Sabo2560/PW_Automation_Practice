@@ -1,0 +1,122 @@
+- generic [ref=f1e1]:
+  - banner [ref=f1e2]:
+    - generic [ref=f1e3]:
+      - link [ref=f1e4] [cursor=pointer]:
+        - /url: /
+        - heading "Automation Playground" [level=1] [ref=f1e5]
+      - navigation [ref=f1e7]:
+        - link "Home" [ref=f1e8] [cursor=pointer]:
+          - /url: /
+        - link "Components" [active] [ref=f1e9] [cursor=pointer]:
+          - /url: /components
+        - link "F.A.Q" [ref=f1e10] [cursor=pointer]:
+          - /url: /faq
+  - main [ref=f1e11]:
+    - generic [ref=f1e68]:
+      - heading "Component Showcase" [level=1] [ref=f1e69]
+      - paragraph [ref=f1e70]: Ready-to-use components made for automation testing – easy to start with for beginners and powerful enough for professionals.
+      - generic [ref=f1e73]:
+        - 'button "Difficulty: All" [ref=f1e75] [cursor=pointer]'
+        - 'button "Type: All" [ref=f1e79] [cursor=pointer]'
+      - generic [ref=f1e82]:
+        - generic [ref=f1e83]:
+          - generic [ref=f1e84]:
+            - heading "Input" [level=2] [ref=f1e86]
+            - paragraph [ref=f1e89]: Interact with different types of input fields
+          - link "Edit" [ref=f1e91] [cursor=pointer]:
+            - /url: components/input
+        - generic [ref=f1e92]:
+          - generic [ref=f1e93]:
+            - heading "Button" [level=2] [ref=f1e95]
+            - paragraph [ref=f1e99]: Interact with different types of buttons
+          - link "Click" [ref=f1e101] [cursor=pointer]:
+            - /url: components/button
+        - generic [ref=f1e102]:
+          - generic [ref=f1e103]:
+            - heading "Dropdown" [level=2] [ref=f1e105]
+            - paragraph [ref=f1e109]: Interact with different types of dropdown
+          - link "Dropdown" [ref=f1e111] [cursor=pointer]:
+            - /url: components/dropdown
+        - generic [ref=f1e112]:
+          - generic [ref=f1e113]:
+            - heading "Multiselect" [level=2] [ref=f1e115]
+            - paragraph [ref=f1e119]: Interact with different types of multiselect
+          - link "Multiselect" [ref=f1e121] [cursor=pointer]:
+            - /url: components/multiselect
+        - generic [ref=f1e122]:
+          - generic [ref=f1e123]:
+            - heading "Alert" [level=2] [ref=f1e125]
+            - paragraph [ref=f1e128]: Interact with different types of buttons
+          - link "Get alert" [ref=f1e130] [cursor=pointer]:
+            - /url: components/alert
+        - generic [ref=f1e131]:
+          - generic [ref=f1e132]:
+            - heading "Radio" [level=2] [ref=f1e134]
+            - paragraph [ref=f1e141]: Interact with different types of radio & check boxes
+          - link "Toggle" [ref=f1e143] [cursor=pointer]:
+            - /url: components/radio
+        - generic [ref=f1e144]:
+          - generic [ref=f1e145]:
+            - heading "Drag" [level=2] [ref=f1e147]
+            - paragraph [ref=f1e153]: Drag me here and there
+          - link "Drag" [ref=f1e155] [cursor=pointer]:
+            - /url: components/drag
+        - generic [ref=f1e156]:
+          - generic [ref=f1e157]:
+            - heading "Wait" [level=2] [ref=f1e159]
+            - paragraph [ref=f1e163]: Wait for alert to pop up after a random amount of time
+          - link "Wait" [ref=f1e165] [cursor=pointer]:
+            - /url: components/wait
+        - generic [ref=f1e166]:
+          - generic [ref=f1e167]:
+            - heading "Simple Table" [level=2] [ref=f1e169]
+            - paragraph [ref=f1e172]: Interact with different types of tables
+          - link "Simple Table" [ref=f1e174] [cursor=pointer]:
+            - /url: components/simple-table
+        - generic [ref=f1e175]:
+          - generic [ref=f1e176]:
+            - heading "Advanced Table" [level=2] [ref=f1e178]
+            - paragraph [ref=f1e181]: Interact with different types of advanced tables
+          - link "Advanced Table" [ref=f1e183] [cursor=pointer]:
+            - /url: components/advanced-table
+        - generic [ref=f1e184]:
+          - generic [ref=f1e185]:
+            - heading "Form" [level=2] [ref=f1e187]
+            - paragraph [ref=f1e191]: Interact with a form that consists of various elements
+          - link "Form" [ref=f1e193] [cursor=pointer]:
+            - /url: components/form
+        - generic [ref=f1e194]:
+          - generic [ref=f1e195]:
+            - heading "Calendar" [level=2] [ref=f1e197]
+            - paragraph [ref=f1e200]: Interact with calendar inputs
+          - link "Calendar" [ref=f1e202] [cursor=pointer]:
+            - /url: components/calendar
+        - generic [ref=f1e203]:
+          - generic [ref=f1e204]:
+            - heading "Slider" [level=2] [ref=f1e206]
+            - paragraph [ref=f1e208]: Interact with slider inputs
+          - link "Slider" [ref=f1e210] [cursor=pointer]:
+            - /url: components/slider
+        - generic [ref=f1e211]:
+          - generic [ref=f1e212]:
+            - heading "Upload File" [level=2] [ref=f1e214]
+            - paragraph [ref=f1e218]: Upload File locally
+          - link "Upload File" [ref=f1e220] [cursor=pointer]:
+            - /url: components/uploadFile
+        - generic [ref=f1e221]:
+          - generic [ref=f1e222]:
+            - heading "Drag and Drop" [level=2] [ref=f1e224]
+            - paragraph [ref=f1e232]: Drag and Drop elements between different areas
+          - link "Drag and Drop" [ref=f1e234] [cursor=pointer]:
+            - /url: components/dragAndDrop
+        - generic [ref=f1e235]:
+          - generic [ref=f1e236]:
+            - heading "Window" [level=2] [ref=f1e238]
+            - paragraph [ref=f1e243]: Interact with opening browser window
+          - link "Window" [ref=f1e245] [cursor=pointer]:
+            - /url: components/window
+  - contentinfo [ref=f1e62]:
+    - paragraph [ref=f1e63]:
+      - generic [ref=f1e64]: © 2026 Automation Playground.
+      - generic [ref=f1e65]: All rights reserved.
+  - alert [ref=f1e66]
