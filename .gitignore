@@ -1,4 +1,3 @@
-
 # Playwright
 node_modules/
 /test-results/
@@ -6,3 +5,35 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Playwright MCP / agent scratch files (console logs, page snapshots)
+# — transient debugging output from Planner/Generator/Healer runs, not
+# something worth committing or reviewing in a diff.
+.playwright-mcp/
+
+# Local API discovery output (from scripts/discover-api.js)
+api-results/
+api-discovery-results.json
+
+# Claude Code local settings (machine-specific, not shared config)
+.claude/settings.local.json
+
+# Environment variables / secrets — never commit these
+.env
+.env.local
+.env.*.local
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+
+# npm/yarn logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
