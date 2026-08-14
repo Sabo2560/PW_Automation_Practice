@@ -151,6 +151,11 @@ Ambiguous/unverified areas explicitly flagged for testers:
     - expect: results summary text equals exactly 'Showing 1 to 10 of 64 entries' (no '(filtered from...)' suffix, confirming the component treats whitespace-only input as equivalent to no search term)
     - expect: the page indicator equals '1 / 7', matching the default unfiltered state exactly
 
+  2. **[BUG, scenario 2.6 revised]** Whitespace-only search input (e.g. a single space) is treated as an active
+   filter term rather than being ignored: the results summary shows "(filtered from 64 total entries)" even
+   though the filtered set matches all 64 records (row count, page count, and row order are all identical to
+   the true unfiltered default). Cosmetic/messaging bug only — no functional impact on row rendering or
+   pagination — but the summary text is misleading, implying a search is narrowing results when it is not.
 ### 3. Advanced Table - Page Size Selector
 
 **Seed:** `tests/seed.spec.ts`
@@ -305,3 +310,6 @@ Ambiguous/unverified areas explicitly flagged for testers:
     - expect: The collected list contains exactly 64 unique ID values, forming the complete set 1 through 64 with no duplicates and no gaps
   2. Search for 'India' (8 matches) and separately search for 'United States' (largest expected subset), summing their filtered counts alongside a manual scan of the full unfiltered dataset for sanity
     - expect: The filtered count shown in the results summary for 'India' equals 8, matching the count independently observed during initial search exploration (regression-style check against a known-good baseline captured during planning)
+
+
+    
