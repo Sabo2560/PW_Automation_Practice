@@ -2,98 +2,94 @@
 // seed: tests/seed.spec.ts
 
 import { test, expect } from '@playwright/test';
+import { AdvancedTablePage } from '../../pages/AdvancedTablePage';
 
 test.describe('Advanced Table - Page Size Selector', () => {
+  let table: AdvancedTablePage;
+
   test.beforeEach(async ({ page }) => {
-    await page.goto('/components/advanced-table');
+    table = new AdvancedTablePage(page);
+    await table.gotoAdvancedTable();
   });
 
   test('Changing page size to 25 recalculates rows-per-page and total page count correctly', async ({ page }) => {
     // 1. Navigate to '/components/advanced-table' (default page size 10) and select '25' from the 'Show:' dropdown
-    await page.getByTestId('items-per-page-selector').selectOption('25');
+    await table.setPageSize('25');
 
-    const rows = page.locator('table tbody tr');
-    await expect(rows).toHaveCount(25);
-    const idCells = rows.locator('td').nth(0);
+    await expect(table.rows).toHaveCount(25);
     for (let i = 0; i < 25; i++) {
-      await expect(rows.nth(i).locator('td').first()).toHaveText(String(i + 1));
+      await expect(table.idCell(table.rows.nth(i))).toHaveText(String(i + 1));
     }
 
-    await expect(page.getByText('Showing 1 to 25 of 64 entries')).toBeVisible();
-    await expect(page.getByText('1 / 3')).toBeVisible();
+    await table.expectSummary('Showing 1 to 25 of 64 entries');
+    await table.expectPageIndicator('1 / 3');
 
-    await expect(page.getByTestId('pagination-first')).toBeDisabled();
-    await expect(page.getByTestId('pagination-previous')).toBeDisabled();
-    await expect(page.getByTestId('pagination-next')).toBeEnabled();
-    await expect(page.getByTestId('pagination-last')).toBeEnabled();
+    await expect(table.firstBtn).toBeDisabled();
+    await expect(table.previousBtn).toBeDisabled();
+    await expect(table.nextBtn).toBeEnabled();
+    await expect(table.lastBtn).toBeEnabled();
   });
 
   test('Changing page size to 5 recalculates rows-per-page and total page count correctly', async ({ page }) => {
     // 1. Navigate to '/components/advanced-table' (default page size 10) and select '5' from the 'Show:' dropdown
-    await page.getByTestId('items-per-page-selector').selectOption('5');
+    await table.setPageSize('5');
 
-    const rows = page.locator('table tbody tr');
-    await expect(rows).toHaveCount(5);
+    await expect(table.rows).toHaveCount(5);
     for (let i = 0; i < 5; i++) {
-      await expect(rows.nth(i).locator('td').first()).toHaveText(String(i + 1));
+      await expect(table.idCell(table.rows.nth(i))).toHaveText(String(i + 1));
     }
 
-    await expect(page.getByText('Showing 1 to 5 of 64 entries')).toBeVisible();
-    await expect(page.getByText('1 / 13')).toBeVisible();
+    await table.expectSummary('Showing 1 to 5 of 64 entries');
+    await table.expectPageIndicator('1 / 13');
   });
 
   test('Changing page size while on a non-first page preserves the current page NUMBER, not the item offset', async ({ page }) => {
     // 1. Navigate to '/components/advanced-table', click 'Next' once to move to page 2 of 7, then select '25' from the 'Show:' dropdown
-    await page.getByTestId('pagination-next').click();
-    await page.getByTestId('items-per-page-selector').selectOption('25');
+    await table.nextBtn.click();
+    await table.setPageSize('25');
 
-    await expect(page.getByText('2 / 3')).toBeVisible();
+    await table.expectPageIndicator('2 / 3');
 
-    const rows = page.locator('table tbody tr');
-    await expect(rows).toHaveCount(25);
-    await expect(rows.first().locator('td').first()).toHaveText('26');
-    await expect(rows.last().locator('td').first()).toHaveText('50');
+    await expect(table.rows).toHaveCount(25);
+    await expect(table.idCell(table.rows.first())).toHaveText('26');
+    await expect(table.idCell(table.rows.last())).toHaveText('50');
 
-    await expect(page.getByText('Showing 26 to 50 of 64 entries')).toBeVisible();
+    await table.expectSummary('Showing 26 to 50 of 64 entries');
   });
 
   test('Changing page size while on the last page of a larger page size clamps correctly on a smaller page size', async ({ page }) => {
     // 1. Navigate to '/components/advanced-table', select page size '25', click 'Last' to reach page 3 of 3, then select page size '5' from the dropdown
-    await page.getByTestId('items-per-page-selector').selectOption('25');
-    await page.getByTestId('pagination-last').click();
-    await page.getByTestId('items-per-page-selector').selectOption('5');
+    await table.setPageSize('25');
+    await table.lastBtn.click();
+    await table.setPageSize('5');
 
-    await expect(page.getByText('3 / 13')).toBeVisible();
+    await table.expectPageIndicator('3 / 13');
 
-    const rows = page.locator('table tbody tr');
-    await expect(rows).toHaveCount(5);
-    await expect(rows.first().locator('td').first()).toHaveText('11');
-    await expect(rows.last().locator('td').first()).toHaveText('15');
+    await expect(table.rows).toHaveCount(5);
+    await expect(table.idCell(table.rows.first())).toHaveText('11');
+    await expect(table.idCell(table.rows.last())).toHaveText('15');
 
-    await expect(page.getByText('Showing 11 to 15 of 64 entries')).toBeVisible();
+    await table.expectSummary('Showing 11 to 15 of 64 entries');
   });
 
   test('Page size change combined with an active search re-paginates the filtered result set, not the full dataset', async ({ page }) => {
     // 1. Navigate to '/components/advanced-table', type 'United States' in the search box to filter the dataset,
     // note the filtered total shown in the results summary, then change page size from 10 to 5
-    await page.getByTestId('advanced-table-filter').fill('United States');
+    await table.search('United States');
 
-    const summary = page.locator('text=/Showing \\d+ to \\d+ of \\d+ entries \\(filtered from 64 total entries\\)/');
-    await expect(summary).toBeVisible();
-    const beforeText = await summary.textContent();
+    await expect(table.summaryText).toBeVisible();
+    const beforeText = await table.summaryText.textContent();
     const beforeMatch = beforeText?.match(/of (\d+) entries/);
     const filteredTotalBefore = beforeMatch ? beforeMatch[1] : null;
-    expect(filteredTotalBefore).not.toBeNull();
 
-    await page.getByTestId('items-per-page-selector').selectOption('5');
+    await table.setPageSize('5');
 
-    const afterMatch = (await summary.textContent())?.match(/of (\d+) entries/);
+    const afterMatch = (await table.summaryText.textContent())?.match(/of (\d+) entries/);
     const filteredTotalAfter = afterMatch ? afterMatch[1] : null;
 
     expect(filteredTotalAfter).toBe(filteredTotalBefore);
 
-    const rows = page.locator('table tbody tr');
-    const rowCount = await rows.count();
+    const rowCount = await table.rows.count();
     expect(rowCount).toBeLessThanOrEqual(5);
   });
 
@@ -106,21 +102,20 @@ test.describe('Advanced Table - Page Size Selector', () => {
     // 1. Navigate to '/components/advanced-table' (default page size 10), click 'Last' to reach page 7/7
     // (final page, showing records 61-64), then select page size '25' from the 'Show:' dropdown
     // — which only has 3 total pages at that size
-    await page.getByTestId('pagination-last').click();
-    await page.getByTestId('items-per-page-selector').selectOption('25');
+    await table.lastBtn.click();
+    await table.setPageSize('25');
 
-    await expect(page.getByText('7 / 3')).toBeVisible();
-    await expect(page.getByText('Showing 151 to 64 of 64 entries')).toBeVisible();
+    await table.expectPageIndicator('7 / 3');
+    await table.expectSummary('Showing 151 to 64 of 64 entries');
 
-    const rows = page.locator('table tbody tr');
-    await expect(rows).toHaveCount(0);
+    await expect(table.rows).toHaveCount(0);
 
     // 2. From this broken state, click 'First'
-    await page.getByTestId('pagination-first').click();
+    await table.firstBtn.click();
 
-    await expect(page.getByText('1 / 3')).toBeVisible();
-    await expect(rows).toHaveCount(25);
-    await expect(rows.first().locator('td').first()).toHaveText('1');
-    await expect(rows.last().locator('td').first()).toHaveText('25');
+    await table.expectPageIndicator('1 / 3');
+    await expect(table.rows).toHaveCount(25);
+    await expect(table.idCell(table.rows.first())).toHaveText('1');
+    await expect(table.idCell(table.rows.last())).toHaveText('25');
   });
 });

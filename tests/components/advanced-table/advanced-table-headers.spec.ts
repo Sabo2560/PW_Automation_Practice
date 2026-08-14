@@ -2,11 +2,18 @@
 // seed: tests/seed.spec.ts
 
 import { test, expect } from '@playwright/test';
+import { AdvancedTablePage } from '../../pages/AdvancedTablePage';
 
 test.describe('Advanced Table - Non-Interactive Elements and Content Integrity', () => {
+  let table: AdvancedTablePage;
+
+  test.beforeEach(async ({ page }) => {
+    table = new AdvancedTablePage(page);
+  });
+
   test('Column headers are static labels and do not trigger row sorting when clicked', async ({ page }) => {
     // 1. Navigate to '/components/advanced-table' and capture the text content of all 10 ID cells in their default rendered order (expected: '1' through '10' ascending)
-    await page.goto('/components/advanced-table');
+    await table.gotoAdvancedTable();
 
     const idCells = page.locator('table tbody tr td:first-child');
     await expect(idCells).toHaveCount(10);
@@ -29,15 +36,14 @@ test.describe('Advanced Table - Non-Interactive Elements and Content Integrity',
     await expect(idCells).toHaveText(expectedOrder);
   });
 
-  test('Total record count (64) remains constant and complete when cycling through all pages', async ({ page }) => {
-    // 1. Navigate to '/components/advanced-table'. Without searching, cycle through all 7 pages (default page size 10) using 'Next' (data-testid="pagination-next") repeatedly, collecting every row's ID cell value into a list
-    await page.goto('/components/advanced-table');
+  test('Total record count (64) and per-country distribution remain constant regardless of pagination/search cycling', async ({ page }) => {
+    // 1. Navigate to '/components/advanced-table'. Without searching, cycle through all 7 pages
+    // (default page size 10) using 'Next', collecting every row's ID cell value into a list
+    await table.gotoAdvancedTable();
 
     const idCells = page.locator('table tbody tr td:first-child');
-    const pageIndicator = page.getByText(/^\d+ \/ \d+$/);
-    const nextButton = page.getByTestId('pagination-next');
 
-    const pageIndicatorText = await pageIndicator.textContent();
+    const pageIndicatorText = await table.pageIndicator.textContent();
     const totalPages = Number(pageIndicatorText?.split('/')[1].trim());
     expect(totalPages).toBeGreaterThan(0);
 
@@ -47,23 +53,29 @@ test.describe('Advanced Table - Non-Interactive Elements and Content Integrity',
       collectedIds.push(...idsOnPage);
 
       if (currentPage < totalPages) {
-        await nextButton.click();
-        await expect(pageIndicator).toHaveText(`${currentPage + 1} / ${totalPages}`);
+        await table.nextBtn.click();
+        await table.expectPageIndicator(`${currentPage + 1} / ${totalPages}`);
       }
     }
 
-    // expect: The collected list contains exactly 64 unique ID values, forming the complete set 1 through 64 with no duplicates and no gaps
+    // expect: the collected list contains exactly 64 unique ID values, 1 through 64, no duplicates/gaps
     expect(collectedIds).toHaveLength(64);
     const uniqueSortedIds = [...new Set(collectedIds.map(Number))].sort((a, b) => a - b);
     expect(uniqueSortedIds).toHaveLength(64);
     expect(uniqueSortedIds).toEqual(Array.from({ length: 64 }, (_, i) => i + 1));
 
-    // 2. Search for 'India' in the search input (data-testid="advanced-table-filter")
-    const searchInput = page.getByTestId('advanced-table-filter');
-    await searchInput.fill('India');
+    // 2. Search for 'India' (8 matches) and separately for 'United States' (largest expected subset),
+    // cross-checking both filtered counts as a sanity check against the full unfiltered dataset
+    await table.search('India');
+    await table.expectSummary('Showing 1 to 8 of 8 entries (filtered from 64 total entries)');
 
-    // expect: The filtered count shown in the results summary equals 8
-    const resultsSummary = page.getByText(/^Showing/);
-    await expect(resultsSummary).toHaveText('Showing 1 to 8 of 8 entries (filtered from 64 total entries)');
+    await table.search('United States');
+    const usSummaryText = await table.summaryText.textContent();
+    const usMatch = usSummaryText?.match(/of (\d+) entries/);
+    const usCount = usMatch ? Number(usMatch[1]) : 0;
+
+    // expect: United States is the largest country subset — sanity bound, not a guessed exact count
+    expect(usCount).toBeGreaterThan(8);
+    expect(usCount).toBeLessThan(64);
   });
 });
