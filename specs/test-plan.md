@@ -215,7 +215,6 @@ One suite per component, once individually planned:
 
 | Component | Key test cases |
 |---|---|
-| Button | Click, disabled state, loading state, double-click prevention |
 | Dropdown | Open/close, select option, keyboard navigation, default value |
 | Multiselect | Select multiple, deselect, select all/none, search/filter if present |
 | Radio | Select option, checkbox toggle, group exclusivity, default state |
@@ -228,7 +227,7 @@ One suite per component, once individually planned:
 | Drag and Drop | Move item between zones, cancel drop outside target, multiple items |
 | Window | Trigger new window/tab, verify content, verify original window state |
 
-Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`).
+Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`).
 
 ## 9. Alert Component (`/components/alert`) — Partially Implemented
 
