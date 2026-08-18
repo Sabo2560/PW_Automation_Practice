@@ -215,7 +215,6 @@ One suite per component, once individually planned:
 
 | Component | Key test cases |
 |---|---|
-| Dropdown | Open/close, select option, keyboard navigation, default value |
 | Multiselect | Select multiple, deselect, select all/none, search/filter if present |
 | Radio | Select option, checkbox toggle, group exclusivity, default state |
 | Wait | Trigger action, assert alert appears within expected async delay |
@@ -226,7 +225,7 @@ One suite per component, once individually planned:
 | Drag and Drop | Move item between zones, cancel drop outside target, multiple items |
 | Window | Trigger new window/tab, verify content, verify original window state |
 
-Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`).
+Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`), Dropdown (`specs/dropdown.plan.md`).
 
 ## 9. Alert Component (`/components/alert`) — Implemented
 
