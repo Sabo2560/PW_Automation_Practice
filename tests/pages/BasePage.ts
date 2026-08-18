@@ -8,6 +8,18 @@ export class BasePage {
   }
 
   async goto(path: string) {
-    await this.page.goto(path);
+    return this.page.goto(path);
+  }
+
+  /**
+   * Registers a console-error collector and returns the backing array. Call before
+   * navigating so no early errors are missed; read the array's contents at any point.
+   */
+  trackConsoleErrors(): string[] {
+    const consoleErrors: string[] = [];
+    this.page.on('console', (msg) => {
+      if (msg.type() === 'error') consoleErrors.push(msg.text());
+    });
+    return consoleErrors;
   }
 }

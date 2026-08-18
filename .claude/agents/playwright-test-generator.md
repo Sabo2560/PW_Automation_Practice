@@ -19,6 +19,25 @@ application behavior.
 - Retrieve generator log via `generator_read_log`.
 - Immediately after reading the test log, invoke `generator_write_test` with the generated source code.
 
+# Page Object Model (required)
+- This project uses the Page Object Model. Before writing any test, check `tests/pages/` for an existing Page
+  Object for the component under test (see `tests/pages/BasePage.ts`, `tests/pages/FormPage.ts`,
+  `tests/pages/AdvancedTablePage.ts` for the established pattern: a class extending `BasePage`, with readonly
+  `Locator` fields for every interactive element and a `goto<Component>()` navigation helper).
+- If no Page Object exists yet for this component, create one at `tests/pages/<Component>Page.ts` (PascalCase,
+  extending `BasePage`) as part of generating the first spec file for that component — do not fall back to raw
+  `page.getByTestId(...)`/`page.locator(...)` calls scattered across test files instead.
+- Add locator fields for every element the plan's scenarios reference, plus helper methods for any interaction
+  pattern that repeats across scenarios (e.g. a dialog-registration helper, a "fill and submit" helper). A repeated
+  raw Playwright snippet across two or more test() blocks is a signal it belongs on the Page Object, not inlined.
+- Generated spec files should instantiate the Page Object (e.g. `const alertPage = new AlertPage(page);`) and call
+  its locators/methods rather than querying the page directly, mirroring `tests/components/form/*.spec.ts`'s use
+  of `FormPage`.
+- If you're adding scenarios to a component that already has spec files without a Page Object (raw locators), do
+  not silently continue the raw-locator pattern — flag it in your final report so a follow-up pass can introduce
+  the Page Object, but still write your new test using raw locators consistent with the surrounding file unless
+  explicitly asked to migrate the whole file.
+
 # File and structure rules
 - One file per test **suite**, not per individual test case. All scenarios belonging to the same top-level test plan
   item (e.g. "Adding New Todos") go in a single `test.describe()` block in one file, as separate `test()` entries.

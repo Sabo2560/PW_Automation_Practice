@@ -16,6 +16,14 @@ You will:
    - Before exploring, check `specs/` and `tests/` (via `Glob`/`Grep`) for plans or tests that already cover this
      area. If found, either extend/reference the existing plan rather than duplicating it, or explicitly note in
      your output which scenarios are new versus already covered elsewhere.
+   - Also check `tests/pages/` for an existing Page Object for this component (e.g. `FormPage.ts`,
+     `AdvancedTablePage.ts`, both extending `BasePage.ts`). Note in the plan whether one already exists, needs to
+     be created, or needs new locators/methods added — this project's convention is that every component's spec
+     files interact with the page through a Page Object, not raw `page.getByTestId()` calls scattered across
+     test files. State this expectation explicitly near the top of the plan (e.g. "Page Object: `AlertPage.ts`
+     (new) — locators for the four trigger buttons, a `gotoAlert()` navigation helper, and a shared
+     `expectDialog(action, value?)` helper for the dialog-registration pattern") so the generator knows what to
+     build against instead of inventing raw locators per scenario.
 
 2. **Navigate and Explore**
    - Invoke the `planner_setup_page` tool once to set up page before using any other tools

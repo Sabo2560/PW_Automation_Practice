@@ -2,14 +2,16 @@
 // seed: tests/seed.spec.ts
 
 import { test, expect } from '@playwright/test';
+import { ButtonPage } from '../../pages/ButtonPage';
 
 test.describe('Button - Go Home Navigation', () => {
   test("Clicking 'Go Home' navigates to the home page in the same tab", async ({ page, context }) => {
-    // 1. Navigate to '/components/button' and inspect the wrapping '<a>' element around '[data-testid="button-go-home"]' without clicking
-    await page.goto('/components/button');
+    const buttonPage = new ButtonPage(page);
 
-    const goHomeButton = page.locator('[data-testid="button-go-home"]');
-    const goHomeLink = page.locator('a', { has: goHomeButton });
+    // 1. Navigate to '/components/button' and inspect the wrapping '<a>' element around '[data-testid="button-go-home"]' without clicking
+    await buttonPage.gotoButton();
+
+    const goHomeLink = page.locator('a', { has: buttonPage.goHomeBtn });
 
     // expect: The wrapping link's href attribute equals '/'
     await expect(goHomeLink).toHaveAttribute('href', '/');
@@ -18,7 +20,7 @@ test.describe('Button - Go Home Navigation', () => {
 
     // 2. Click '[data-testid="button-go-home"]'
     const pagesBeforeClick = context.pages().length;
-    await goHomeButton.click();
+    await buttonPage.goHomeBtn.click();
 
     // expect: The browser navigates to '/' within the SAME tab/page (no new tab or window is opened)
     expect(context.pages().length).toBe(pagesBeforeClick);
