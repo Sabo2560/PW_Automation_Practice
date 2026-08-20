@@ -20,8 +20,26 @@ jobs:
         node-version: lts/*
     - name: Install dependencies
       run: npm ci
+    # Caches the downloaded browser binaries (not the OS-level apt packages --with-deps also
+    # installs, which can't persist across runs since each job gets a fresh VM) so a cache hit
+    # skips re-downloading Chromium/Firefox/WebKit.
+    - name: Cache Playwright browser binaries
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    # --with-deps is required for WebKit specifically — ubuntu-latest doesn't ship its GTK4/
+    # GStreamer/flite libraries out of the box, and dropping this flag once already broke every
+    # WebKit test in CI (browserType.launch failing on ~30 missing .so files). The tradeoff is
+    # that --with-deps shells out to `apt-get update`, which occasionally hangs against a slow/
+    # degraded Ubuntu mirror. Wrapped in a retry so one bad mirror hit gets retried automatically
+    # instead of riding out the full 60-minute job timeout.
     - name: Install Playwright Browsers
-      run: npx playwright install
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 10
+        max_attempts: 3
+        command: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
     - uses: actions/upload-artifact@v4
