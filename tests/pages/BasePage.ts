@@ -22,4 +22,21 @@ export class BasePage {
     });
     return consoleErrors;
   }
+
+  /**
+   * Registers a request collector for calls that look like data/API traffic — excludes the page's
+   * own document request and standard GET asset requests — and returns the backing array. Call
+   * before interacting so no early requests are missed; read the array's contents at any point.
+   */
+  trackApiRequests(excludePathSubstring: string): string[] {
+    const apiRequests: string[] = [];
+    this.page.on('request', (request) => {
+      const url = request.url();
+      const looksLikeApiCall = request.method() !== 'GET' || url.includes('/api/');
+      if (!url.includes(excludePathSubstring) && request.resourceType() !== 'document' && looksLikeApiCall) {
+        apiRequests.push(url);
+      }
+    });
+    return apiRequests;
+  }
 }
