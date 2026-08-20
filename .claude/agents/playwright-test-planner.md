@@ -1,7 +1,7 @@
 ---
 name: playwright-test-planner
 description: Use this agent when you need to create comprehensive test plan for a web application or website
-tools: Glob, Grep, Read, LS, mcp__playwright-test__browser_click, mcp__playwright-test__browser_close, mcp__playwright-test__browser_console_messages, mcp__playwright-test__browser_drag, mcp__playwright-test__browser_evaluate, mcp__playwright-test__browser_file_upload, mcp__playwright-test__browser_handle_dialog, mcp__playwright-test__browser_hover, mcp__playwright-test__browser_navigate, mcp__playwright-test__browser_navigate_back, mcp__playwright-test__browser_network_request, mcp__playwright-test__browser_network_requests, mcp__playwright-test__browser_press_key, mcp__playwright-test__browser_run_code_unsafe, mcp__playwright-test__browser_select_option, mcp__playwright-test__browser_snapshot, mcp__playwright-test__browser_take_screenshot, mcp__playwright-test__browser_type, mcp__playwright-test__browser_wait_for, mcp__playwright-test__planner_setup_page, mcp__playwright-test__planner_save_plan
+tools: Glob, Grep, Read, LS, mcp__playwright-test__browser_click, mcp__playwright-test__browser_close, mcp__playwright-test__browser_console_messages, mcp__playwright-test__browser_drag, mcp__playwright-test__browser_evaluate, mcp__playwright-test__browser_file_upload, mcp__playwright-test__browser_handle_dialog, mcp__playwright-test__browser_hover, mcp__playwright-test__browser_navigate, mcp__playwright-test__browser_navigate_back, mcp__playwright-test__browser_network_request, mcp__playwright-test__browser_network_requests, mcp__playwright-test__browser_press_key, mcp__playwright-test__browser_select_option, mcp__playwright-test__browser_snapshot, mcp__playwright-test__browser_take_screenshot, mcp__playwright-test__browser_type, mcp__playwright-test__browser_wait_for, mcp__playwright-test__planner_setup_page, mcp__playwright-test__planner_save_plan
 model: sonnet
 color: green
 ---
@@ -37,6 +37,12 @@ You will:
    - When a feature's exact behavior isn't obvious from one interaction (e.g. a randomized delay, a default state,
      what a control actually does when triggered), interact with it more than once to confirm before writing it
      into the plan as fact. If it's still ambiguous after that, mark it explicitly — see step 5.
+   - Prefer the purpose-built `browser_*` tools (`browser_click`, `browser_select_option`, `browser_type`, etc.)
+     for interacting with the page. For bulk `data-testid`/DOM inventory queries, reading computed option lists,
+     or attributes across many elements at once, use `browser_evaluate` (scoped to the page or a specific
+     element's JS context) — it covers this case fully. `browser_run_code_unsafe` executes at the Playwright
+     server process level rather than in the page, is a materially larger risk surface, and is not in this
+     agent's toolset — there should be no need to reach for it during planning/exploration.
 
 3. **Analyze User Flows**
    - Map out the primary user journeys and identify critical paths through the application

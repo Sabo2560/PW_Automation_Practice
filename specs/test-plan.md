@@ -215,7 +215,6 @@ One suite per component, once individually planned:
 
 | Component | Key test cases |
 |---|---|
-| Multiselect | Select multiple, deselect, select all/none, search/filter if present |
 | Radio | Select option, checkbox toggle, group exclusivity, default state |
 | Wait | Trigger action, assert alert appears within expected async delay |
 | Simple Table | Row count, column headers, sorting (if present), cell content |
@@ -225,7 +224,7 @@ One suite per component, once individually planned:
 | Drag and Drop | Move item between zones, cancel drop outside target, multiple items |
 | Window | Trigger new window/tab, verify content, verify original window state |
 
-Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`), Dropdown (`specs/dropdown.plan.md`).
+Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`), Dropdown (`specs/dropdown.plan.md`), Multiselect (`specs/multiselect.plan.md`).
 
 ## 9. Alert Component (`/components/alert`) — Implemented
 
@@ -233,13 +232,21 @@ Fully planned separately (see linked docs): Advanced Table (`specs/advanced-tabl
 
 Fully planned separately (see linked doc): Alert (`specs/alert.plan.md`).
 
-## 10. FAQ Page — Not Yet Planned
+## 10. Multiselect Component (`/components/multiselect`) — Implemented
+
+**Status:** Fully implemented (`tests/components/multiselect/`, 20 scenarios across 7 spec files, all passing across chromium/firefox/webkit). The page presents three independent instances of a searchable, chip-based multi-select widget (`multiselect-react-dropdown`): Form 1 (10 options, starts empty), Form 2 (3 options, starts empty — used to exercise the "all options selected" empty state), and Form 3 (10 options, starts with two pre-selected chips). All interactions are purely client-side with no backing API calls.
+
+Notable quirks confirmed during planning (see `specs/multiselect.plan.md` for full detail): `Escape` does not close an open option list; the same "No Options Available" message covers two different triggers (all options selected vs. a search filter with zero matches); and `#search_input`/`#multiselectContainerReact` are non-unique HTML ids duplicated across all three widget instances (see README's known-findings list).
+
+Fully planned separately (see linked doc): Multiselect (`specs/multiselect.plan.md`).
+
+## 11. FAQ Page — Not Yet Planned
 
 - Page loads
 - FAQ items expand/collapse (accordion) if present
 - Content matches expected copy
 
-## 11. API Testing — Not Yet Planned
+## 12. API Testing — Not Yet Planned
 
 No public API docs exist. Before writing API tests:
 1. Open each component page with DevTools → Network tab open.
@@ -254,7 +261,7 @@ For each component with backend interaction (likely: Form, Advanced Table, Uploa
 - Verify UI reflects API response (success/error states)
 - Negative cases: malformed payload, server error simulation via `page.route()` mocking
 
-## 12. Out of Scope
+## 13. Out of Scope
 
 - Payment/donation flow completion on Buy Me a Coffee (external, 3rd-party — home page only verifies the outbound link target, not the checkout flow)
 - Email client behavior (mailto link — home page only verifies the href, does not send mail)
