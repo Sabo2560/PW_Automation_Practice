@@ -76,6 +76,8 @@ including:
 - Multiselect: `#search_input` and `#multiselectContainerReact` are non-unique HTML ids repeated identically
   across all three widget instances on the same page (invalid HTML — confirmed via `querySelectorAll` returning
   3 elements for each id)
+- Radio: `id="Yes"` and `id="No"` are each used twice document-wide (once in the "answer-radio" group, once in
+  "one-radio") — a duplicate-id defect that also breaks accessible names for both groups
 
 ## CI/CD
 

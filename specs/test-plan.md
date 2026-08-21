@@ -215,16 +215,13 @@ One suite per component, once individually planned:
 
 | Component | Key test cases |
 |---|---|
-| Radio | Select option, checkbox toggle, group exclusivity, default state |
-| Wait | Trigger action, assert alert appears within expected async delay |
-| Simple Table | Row count, column headers, sorting (if present), cell content |
 | Calendar | Pick date, navigate months/years, disabled dates, range selection if present |
 | Slider | Drag to value, keyboard arrow adjustment, min/max bounds |
 | Upload File | Upload valid file, upload invalid type/size, remove uploaded file |
 | Drag and Drop | Move item between zones, cancel drop outside target, multiple items |
 | Window | Trigger new window/tab, verify content, verify original window state |
 
-Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`), Dropdown (`specs/dropdown.plan.md`), Multiselect (`specs/multiselect.plan.md`).
+Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`), Dropdown (`specs/dropdown.plan.md`), Multiselect (`specs/multiselect.plan.md`), Radio (`specs/radio.plan.md`), Simple Table (`specs/simple-table.plan.md`), Wait (`specs/wait.plan.md`).
 
 ## 9. Alert Component (`/components/alert`) — Implemented
 
@@ -240,13 +237,37 @@ Notable quirks confirmed during planning (see `specs/multiselect.plan.md` for fu
 
 Fully planned separately (see linked doc): Multiselect (`specs/multiselect.plan.md`).
 
-## 11. FAQ Page — Not Yet Planned
+## 11. Radio Component (`/components/radio`) — Implemented
+
+**Status:** Fully implemented (`tests/components/radio/`, 20 scenarios across 8 spec files, 56 passing + 1 correctly skipped across chromium/firefox/webkit — the skip is a genuine WebKit engine limitation, not a gap in coverage). The page presents seven independent exercises: two structurally-identical boolean radio groups, a deliberately-buggy "Find the bug" pair with mismatched `name` attributes, a pre-selected Foo/Bar group, a group with a disabled option, and two standalone checkboxes (one with a nested link). All interactions are purely client-side with no backing API calls.
+
+Notable findings confirmed during planning (see `specs/radio.plan.md` for full detail): the "Find the bug" exercise's mismatched-`name` bug is still live and reproducible; `id="Yes"`/`id="No"` are duplicated document-wide across the two boolean radio groups (a genuine HTML defect, not just a testing trap); and WebKit does not move keyboard focus onto radio/checkbox inputs on click (matching real Safari's default behavior), which is why one ArrowDown-cycling test is skipped specifically on that browser.
+
+Fully planned separately (see linked doc): Radio (`specs/radio.plan.md`).
+
+## 12. Simple Table Component (`/components/simple-table`) — Implemented
+
+**Status:** Fully implemented (`tests/components/simple-table/`, 20 scenarios across 7 spec files, all passing across chromium/firefox/webkit). The page presents three independent tables: a shopping table with a computed total, a task table with independent checkboxes, and a sortable salary table (four columns, descending-first on each column's initial click).
+
+Notable quirks confirmed during planning (see `specs/simple-table.plan.md` for full detail): sorting a column never returns to an "unsorted" state once clicked — it toggles strictly between ascending/descending forever; and the Department column's tie-break order for its one duplicate value depends on whatever row order is currently on screen at the moment of the click, not a fixed original-dataset order — sorting the same column can produce opposite tie orders depending on prior sort history.
+
+Fully planned separately (see linked doc): Simple Table (`specs/simple-table.plan.md`).
+
+## 13. Wait Component (`/components/wait`) — Implemented
+
+**Status:** Fully implemented (`tests/components/wait/`, 21 scenarios across 9 spec files, all passing across chromium/firefox/webkit). The page presents four independent asynchronous exercises, each driven by a randomized client-side delay (~2.1s-4.0s observed): a native `alert()` dialog, an element that appears, text that changes, and an element that appears near-instantly then disappears again after a further random delay.
+
+Notable quirks confirmed during planning and test implementation (see `specs/wait.plan.md` for full detail): re-clicking any of the three multi-second-delay buttons while a previous click's delay is still pending schedules a fully independent second timer rather than cancelling/merging with the first (for the alert button this produces two separate sequential native dialogs a test must handle both of); and the displayed delay is rounded to one decimal digit, so two independent random delays can coincidentally render identical text — discovered via real test flakiness during implementation, this makes text-content comparison an unreliable way to prove "an independent second timer fired," which is why the relevant tests count DOM mutations directly or wait out a fixed generous timeout instead of polling for a content difference.
+
+Fully planned separately (see linked doc): Wait (`specs/wait.plan.md`).
+
+## 14. FAQ Page — Not Yet Planned
 
 - Page loads
 - FAQ items expand/collapse (accordion) if present
 - Content matches expected copy
 
-## 12. API Testing — Not Yet Planned
+## 15. API Testing — Not Yet Planned
 
 No public API docs exist. Before writing API tests:
 1. Open each component page with DevTools → Network tab open.
@@ -261,7 +282,7 @@ For each component with backend interaction (likely: Form, Advanced Table, Uploa
 - Verify UI reflects API response (success/error states)
 - Negative cases: malformed payload, server error simulation via `page.route()` mocking
 
-## 13. Out of Scope
+## 16. Out of Scope
 
 - Payment/donation flow completion on Buy Me a Coffee (external, 3rd-party — home page only verifies the outbound link target, not the checkout flow)
 - Email client behavior (mailto link — home page only verifies the href, does not send mail)

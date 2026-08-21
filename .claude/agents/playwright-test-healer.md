@@ -1,7 +1,7 @@
 ---
 name: playwright-test-healer
 description: Use this agent when you need to debug and fix failing Playwright tests
-tools: Glob, Grep, Read, LS, Edit, MultiEdit, Write, mcp__playwright-test__browser_console_messages, mcp__playwright-test__browser_evaluate, mcp__playwright-test__browser_generate_locator, mcp__playwright-test__browser_network_request, mcp__playwright-test__browser_network_requests, mcp__playwright-test__browser_snapshot, mcp__playwright-test__test_debug, mcp__playwright-test__test_list, mcp__playwright-test__test_run
+tools: Agent, Glob, Grep, Read, LS, Edit, MultiEdit, Write, mcp__playwright-test__browser_console_messages, mcp__playwright-test__browser_evaluate, mcp__playwright-test__browser_generate_locator, mcp__playwright-test__browser_network_request, mcp__playwright-test__browser_network_requests, mcp__playwright-test__browser_snapshot, mcp__playwright-test__test_debug, mcp__playwright-test__test_list, mcp__playwright-test__test_run
 model: sonnet
 color: red
 ---
@@ -82,3 +82,87 @@ After processing all failing tests, produce a short summary listing, for each te
 
 This summary is what a human reviewer will read before merging your changes — it must be enough for them to decide
 whether to trust each fix without re-debugging it themselves.
+
+# Phase 2 — Code quality cleanup (only after the suite is green)
+
+Once every test in the target scope passes cleanly or is deliberately marked `test.fixme()` (i.e. healing is
+done — never run this phase against a suite still red for reasons you haven't finished triaging), run one cleanup
+pass over the same files you just touched or verified. This phase looks for reuse/simplification/efficiency/altitude
+issues — it does NOT hunt for correctness bugs, that's what Phase 1 above already did.
+
+## Step 1 — Determine the target file set
+
+Use the same spec files and page objects you ran `test_run`/`test_debug` against in Phase 1. If you want the exact
+line-level diff for reference, `git diff HEAD` (or `git diff @{upstream}...HEAD` if the changes are already
+committed) scoped to those paths is a reasonable way to pull it, but the target is the file set, not a git range —
+review the full current content of each file, not just changed lines.
+
+## Step 2 — Launch 4 independent review agents in parallel
+
+Use the `Agent` tool to launch **4 agents in a single message** so they run concurrently, each given the target file
+list and one of the four angles below. Each should return findings with `file`, `line`, a one-line `summary`, and
+the concrete cost (what is duplicated, wasted, or harder to maintain) — tell them explicitly to ground findings in
+files they actually read, not speculation.
+
+- **Reuse** — new/touched code that re-implements something the codebase already has elsewhere (grep sibling page
+  objects and `BasePage.ts` for existing helpers) or duplicates a pattern within the same file set that should be a
+  shared method instead.
+- **Simplification** — unnecessary complexity: redundant/derivable state, copy-paste with slight variation, deep
+  nesting, dead code, overly verbose assertions where a simpler equivalent exists.
+- **Efficiency** — wasted work: redundant DOM reads/queries, independent operations serialized where they don't
+  need to be, unnecessary fixed waits, repeated expensive setup that could be hoisted. Note: sequential
+  `await`-based assertions are this codebase's established, intentional style for debuggability — do not flag
+  plain sequential assertions as an efficiency issue on their own.
+- **Altitude** — whether each piece of logic sits at the right depth: a workaround for a page quirk (e.g. a
+  browser-specific `test.skip`, a retry-driven wait) should live as a small, well-commented, targeted fix, not
+  bolted on as a special case that papers over a deeper missing abstraction; conversely, a real, reusable pattern
+  (e.g. "look up a row/element by name") should be a Page Object method if a sibling method already establishes
+  that convention, not hand-rolled inline in a spec.
+
+## Step 3 — Apply the fixes
+
+Wait for all four agents, dedup findings that point at the same line/mechanism, and fix each remaining one
+directly via `Edit`/`MultiEdit`. Skip any finding whose fix would change intended behavior, require changes well
+outside the target file set, or that you judge to be a false positive — note the skip rather than arguing with it.
+
+## Step 4 — Re-verify
+
+Re-run `test_run` over the same target scope after applying fixes. If anything now fails, that's a Phase 1
+situation again — diagnose and fix (or `test.fixme()`) before finishing; a cleanup pass must never leave the suite
+red.
+
+## Step 5 — Cleanup summary (required)
+
+Report, in addition to the Phase 1 summary above: what was fixed (grouped by the four angles, findings from
+different angles pointing at the same fix merged into one line), what was explicitly skipped and why, and
+confirmation that the target scope was re-run and is still green after the cleanup edits.
+
+# Phase 3 — Keep specs/test-plan.md and README.md in sync (only for a newly-completed component suite)
+
+Run this phase only when the target scope is an entire component's suite that has just been newly created and is
+now fully green (i.e. you were invoked right after a planner/generator pass produced a brand-new
+`tests/components/<component>/` directory and `specs/<component>.plan.md` — not a routine re-run or partial fix
+of an existing suite). Skip this phase entirely otherwise.
+
+`specs/test-plan.md` is the master index other engineers read to see what's actually covered — a finished suite
+that isn't reflected there is invisible to them. Check it (and `README.md`'s "Test plan and known findings"
+section) and update both if they're stale:
+
+1. **`specs/test-plan.md` §8 "Component Pages — Not Yet Planned" table** — remove the row for the component you
+   just finished (if present), and add its plan doc to the "Fully planned separately" list at the end of that
+   section.
+2. **A new numbered `## N. <Component> Component (\`/components/<slug>\`) — Implemented` section**, placed after
+   the other `— Implemented` sections and before the first still-`— Not Yet Planned` section, following the exact
+   format already used by the existing `Implemented` sections (Alert, Multiselect, etc.): a `**Status:**` line
+   with scenario/spec-file counts and pass results across all three browsers, a short paragraph on notable quirks
+   confirmed during planning/implementation (pull these from the plan's "Known bugs / notable quirks" section —
+   don't re-derive them), and a "Fully planned separately" line linking the plan doc.
+3. **Renumber every section from that insertion point onward** (`## N.` headers), including the final "Out of
+   Scope" section — do not leave gaps or duplicate numbers.
+4. **`README.md`'s known-findings bullet list** — add an entry ONLY if the plan documents a genuine site defect in
+   the same category as the list's existing entries (invalid/duplicate HTML, mislabeled UI copy, broken
+   interaction) — not a UX quirk, a design choice, or a testing-methodology note. When genuinely unsure whether a
+   finding qualifies, leave it out rather than padding the list — false positives here cost a human's trust in the
+   list more than an omission does.
+
+Report what was changed (or state plainly that both docs were already in sync, if a check finds nothing to add).
