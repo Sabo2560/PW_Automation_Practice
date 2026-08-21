@@ -39,10 +39,7 @@ test.describe('Simple Table - Reload Persistence', () => {
 
     // expect: All four salary-table headers ('sort-column-name', 'sort-column-department',
     // 'sort-column-hireDate', 'sort-column-salary') have aria-sort='none' again
-    await simplePage.expectAriaSort('name', 'none');
-    await simplePage.expectAriaSort('department', 'none');
-    await simplePage.expectAriaSort('hireDate', 'none');
-    await simplePage.expectAriaSort('salary', 'none');
+    await simplePage.expectSortState();
 
     // expect: The salary table's rows are back in their original DOM order: Alice Johnson, Bob Smith,
     // Charlie Brown, Diana Prince
@@ -55,14 +52,11 @@ test.describe('Simple Table - Reload Persistence', () => {
 
     // expect: The task table has reverted to its documented default: only 'Write Blog Post' is checked;
     // 'Design Landing Page' and 'Develop API' are both unchecked again
-    await expect(simplePage.taskCheckbox('Write Blog Post')).toBeChecked();
-    await expect(simplePage.taskCheckbox('Design Landing Page')).not.toBeChecked();
-    await expect(simplePage.taskCheckbox('Develop API')).not.toBeChecked();
+    await simplePage.expectTaskDefaultState();
 
     // expect: The shopping table's total is still exactly correct (it has no interactive state to begin
     // with, included here to confirm reload doesn't corrupt static content either) — confirming no
     // localStorage/sessionStorage/URL state is involved anywhere on this page
-    const expectedTotal = await simplePage.computeExpectedShoppingTotal();
-    await expect(simplePage.shoppingTotalCell).toHaveText(String(expectedTotal));
+    await simplePage.expectShoppingTotalCorrect();
   });
 });

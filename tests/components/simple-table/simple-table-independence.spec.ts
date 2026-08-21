@@ -15,15 +15,12 @@ test.describe('Simple Table - Cross-Table Independence and Network Behavior', ()
   test('Sorting the salary table and checking a task checkbox produce zero observable effect on either of the other two tables', async () => {
     // 1. Navigate to '/components/simple-table'. Record the shopping table's tfoot total (590) and the task
     //    table's baseline checkbox states as a reference
-    const expectedTotal = await simplePage.computeExpectedShoppingTotal();
     const originalShoppingRows = await simplePage.shoppingRows.allTextContents();
     const originalSalaryOrder = await simplePage.readColumnValues('name');
 
-    // expect: Baseline recorded: shopping total = 590; task table = only 'Write Blog Post' checked
-    await expect(simplePage.shoppingTotalCell).toHaveText(String(expectedTotal));
-    await expect(simplePage.taskCheckbox('Design Landing Page')).not.toBeChecked();
-    await expect(simplePage.taskCheckbox('Write Blog Post')).toBeChecked();
-    await expect(simplePage.taskCheckbox('Develop API')).not.toBeChecked();
+    // expect: Baseline recorded: shopping total is correct; task table = only 'Write Blog Post' checked
+    await simplePage.expectShoppingTotalCorrect();
+    await simplePage.expectTaskDefaultState();
 
     // 2. Sort the salary table by clicking 'sort-column-salary' twice (ending ascending), and separately check
     //    the 'Develop API' task checkbox
@@ -40,10 +37,10 @@ test.describe('Simple Table - Cross-Table Independence and Network Behavior', ()
     await expect(simplePage.taskCheckbox('Develop API')).toBeChecked();
 
     // 3. Re-read the shopping table's tfoot total and the full row contents of the shopping table
-    // expect: The shopping table's total is still exactly 590 and its 4 rows are still in their original order
-    //         with unchanged values — confirming zero cross-contamination from sorting the salary table or
-    //         checking a task checkbox
-    await expect(simplePage.shoppingTotalCell).toHaveText(String(expectedTotal));
+    // expect: The shopping table's total is still correct and its 4 rows are still in their original order with
+    //         unchanged values — confirming zero cross-contamination from sorting the salary table or checking a
+    //         task checkbox
+    await simplePage.expectShoppingTotalCorrect();
     expect(await simplePage.shoppingRows.allTextContents()).toEqual(originalShoppingRows);
   });
 

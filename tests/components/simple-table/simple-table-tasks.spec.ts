@@ -1,23 +1,26 @@
 // spec: specs/simple-table.plan.md
 // seed: tests/seed.spec.ts
 
-import { test, expect } from '@playwright/test';
+import { test, expect, Locator } from '@playwright/test';
 import { SimpleTablePage } from '../../pages/SimpleTablePage';
 
 test.describe('Simple Table - Task Table Checkbox Verification', () => {
   let simplePage: SimpleTablePage;
+  let designCheckbox: Locator;
+  let blogCheckbox: Locator;
+  let apiCheckbox: Locator;
 
   test.beforeEach(async ({ page }) => {
     simplePage = new SimpleTablePage(page);
     await simplePage.gotoSimpleTable();
+    designCheckbox = simplePage.taskCheckbox('Design Landing Page');
+    blogCheckbox = simplePage.taskCheckbox('Write Blog Post');
+    apiCheckbox = simplePage.taskCheckbox('Develop API');
   });
 
   test("Checking 'Develop API' while 'Write Blog Post' stays checked leaves 'Design Landing Page' unaffected", async () => {
     // 1. Navigate to '/components/simple-table'. Confirm baseline: 'Write Blog Post' checked, 'Design Landing
     //    Page' and 'Develop API' unchecked
-    const designCheckbox = simplePage.taskCheckbox('Design Landing Page');
-    const blogCheckbox = simplePage.taskCheckbox('Write Blog Post');
-    const apiCheckbox = simplePage.taskCheckbox('Develop API');
 
     // expect: Baseline matches the documented defaults exactly
     await expect(blogCheckbox).toBeChecked();
@@ -38,10 +41,6 @@ test.describe('Simple Table - Task Table Checkbox Verification', () => {
   });
 
   test("Unchecking the only pre-checked task ('Write Blog Post') and re-checking it round-trips cleanly with no effect on the other two rows", async () => {
-    const designCheckbox = simplePage.taskCheckbox('Design Landing Page');
-    const blogCheckbox = simplePage.taskCheckbox('Write Blog Post');
-    const apiCheckbox = simplePage.taskCheckbox('Develop API');
-
     // 1. Navigate to '/components/simple-table'. Uncheck the 'Write Blog Post' checkbox
     await blogCheckbox.click();
 
@@ -66,8 +65,6 @@ test.describe('Simple Table - Task Table Checkbox Verification', () => {
   });
 
   test("Clicking a task row's non-checkbox cell (e.g. the task name) does not toggle that row's checkbox", async () => {
-    const designCheckbox = simplePage.taskCheckbox('Design Landing Page');
-
     // 1. Navigate to '/components/simple-table'. Confirm 'Design Landing Page' checkbox is unchecked, then click
     //    directly on the 'Design Landing Page' text cell (not the checkbox itself)
     await expect(designCheckbox).not.toBeChecked();
@@ -79,10 +76,6 @@ test.describe('Simple Table - Task Table Checkbox Verification', () => {
   });
 
   test('Boundary states: checking all three task checkboxes simultaneously, then unchecking all three, both work correctly with no stuck/coupled state', async () => {
-    const designCheckbox = simplePage.taskCheckbox('Design Landing Page');
-    const blogCheckbox = simplePage.taskCheckbox('Write Blog Post');
-    const apiCheckbox = simplePage.taskCheckbox('Develop API');
-
     // 1. Navigate to '/components/simple-table'. Check 'Design Landing Page' and 'Develop API' (in addition to
     //    the already-checked 'Write Blog Post')
     await designCheckbox.click();

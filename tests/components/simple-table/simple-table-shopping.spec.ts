@@ -21,52 +21,43 @@ test.describe('Simple Table - Shopping Table Total Calculation', () => {
     // expect: The computed expected total equals exactly the sum of each row's quantity×price (360 + 100 + 25 + 105)
     expect(expectedTotal).toBe(360 + 100 + 25 + 105);
 
-    // expect: The tfoot's total cell's numeric text content equals the computed expected total exactly (both
-    //         currently resolve to 590, confirmed live, but the assertion must compare against the freshly-computed
-    //         sum, not a literal)
-    const displayedTotalText = await simplePage.shoppingTotalCell.textContent();
-    expect(parseFloat(displayedTotalText ?? '0')).toBe(expectedTotal);
+    // expect: The tfoot's total cell's text equals the computed expected total exactly (both currently resolve to
+    //         590, confirmed live, but the assertion must compare against the freshly-computed sum, not a literal)
+    await expect(simplePage.shoppingTotalCell).toHaveText(String(expectedTotal));
   });
 
   test('Each individual row’s quantity × price line value is independently correct, including the smallest-value and largest-value rows (boundary rows)', async () => {
     // 1. Navigate to '/components/simple-table'. Read the Quantity and Price cells for the 'Eraser' row (the
     //    smallest line total: qty 5 × price 5) and the 'Notebook' row (the largest line total: qty 3 × price 120)
     await simplePage.gotoSimpleTable();
-    const eraserRow = simplePage.shoppingRows.filter({ hasText: 'Eraser' });
-    const notebookRow = simplePage.shoppingRows.filter({ hasText: 'Notebook' });
 
     // expect: 'Eraser' row: quantity cell = '5', price cell = '5', so quantity × price = 25
-    const eraserCells = eraserRow.locator('td');
-    await expect(eraserCells.nth(1)).toHaveText('5');
-    await expect(eraserCells.nth(2)).toHaveText('5');
-    const eraserQty = parseFloat((await eraserCells.nth(1).textContent()) ?? '0');
-    const eraserPrice = parseFloat((await eraserCells.nth(2).textContent()) ?? '0');
-    expect(eraserQty * eraserPrice).toBe(25);
+    const [, eraserQtyText, eraserPriceText] = await simplePage.shoppingRow('Eraser').locator('td').allTextContents();
+    expect(eraserQtyText).toBe('5');
+    expect(eraserPriceText).toBe('5');
+    expect(parseFloat(eraserQtyText) * parseFloat(eraserPriceText)).toBe(25);
 
     // expect: 'Notebook' row: quantity cell = '3', price cell = '120', so quantity × price = 360, confirming the
     //         highest-value row (by unit price) and lowest-value row (by line total) both parse and compute correctly
-    const notebookCells = notebookRow.locator('td');
-    await expect(notebookCells.nth(1)).toHaveText('3');
-    await expect(notebookCells.nth(2)).toHaveText('120');
-    const notebookQty = parseFloat((await notebookCells.nth(1).textContent()) ?? '0');
-    const notebookPrice = parseFloat((await notebookCells.nth(2).textContent()) ?? '0');
-    expect(notebookQty * notebookPrice).toBe(360);
+    const [, notebookQtyText, notebookPriceText] = await simplePage
+      .shoppingRow('Notebook')
+      .locator('td')
+      .allTextContents();
+    expect(notebookQtyText).toBe('3');
+    expect(notebookPriceText).toBe('120');
+    expect(parseFloat(notebookQtyText) * parseFloat(notebookPriceText)).toBe(360);
   });
 
   test('The tfoot total row has exactly one data cell spanning both the Quantity and Price columns via colspan, and there is exactly one total row', async () => {
     // 1. Navigate to '/components/simple-table'. Inspect the shopping table's tfoot
     await simplePage.gotoSimpleTable();
-    const tfootRows = simplePage.shoppingTable.locator('tfoot tr');
 
     // expect: Exactly 1 '<tr>' exists inside 'tfoot'
-    await expect(tfootRows).toHaveCount(1);
+    await expect(simplePage.shoppingTable.locator('tfoot tr')).toHaveCount(1);
 
     // expect: That row contains exactly 2 '<td>' cells: the first with text 'Total', the second with the
     //         'colspan' attribute equal to '2' holding the numeric total text
-    const tfootCells = tfootRows.locator('td');
-    await expect(tfootCells).toHaveCount(2);
-    await expect(tfootCells.first()).toHaveText('Total');
-    await expect(tfootCells.last()).toHaveAttribute('colspan', '2');
-    await expect(tfootCells.last()).toHaveText(/^\d+$/);
+    await expect(simplePage.shoppingTfootCells).toHaveText(['Total', /^\d+$/]);
+    await expect(simplePage.shoppingTotalCell).toHaveAttribute('colspan', '2');
   });
 });

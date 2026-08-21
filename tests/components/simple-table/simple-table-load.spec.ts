@@ -58,24 +58,15 @@ test.describe('Simple Table - Initial Load and Default State', () => {
     await simplePage.gotoSimpleTable();
 
     // expect: Exactly 4 rows are present, in this exact order with these exact cell values
-    await expect(simplePage.shoppingRows).toHaveCount(4);
-    const expectedRows = [
-      ['Notebook', '3', '120'],
-      ['Pen', '10', '10'],
-      ['Eraser', '5', '5'],
-      ['Pencil', '7', '15'],
-    ];
-    for (let i = 0; i < expectedRows.length; i++) {
-      await expect(simplePage.shoppingRows.nth(i).locator('td')).toHaveText(expectedRows[i]);
-    }
+    await expect(simplePage.shoppingRows.locator('td')).toHaveText([
+      'Notebook', '3', '120',
+      'Pen', '10', '10',
+      'Eraser', '5', '5',
+      'Pencil', '7', '15',
+    ]);
 
     // expect: The tfoot contains exactly 1 row with a 'Total' label cell and a single data cell with colspan='2' showing the text '590'
-    const tfootRows = simplePage.shoppingTable.locator('tfoot tr');
-    await expect(tfootRows).toHaveCount(1);
-    const tfootCells = tfootRows.locator('td');
-    await expect(tfootCells).toHaveCount(2);
-    await expect(tfootCells.first()).toHaveText('Total');
-    await expect(simplePage.shoppingTotalCell).toHaveText('590');
+    await expect(simplePage.shoppingTfootCells).toHaveText(['Total', '590']);
     await expect(simplePage.shoppingTotalCell).toHaveAttribute('colspan', '2');
   });
 
@@ -84,12 +75,8 @@ test.describe('Simple Table - Initial Load and Default State', () => {
     //    checkboxes in '[data-testid="task-table"]', matched by their row's task name
     await simplePage.gotoSimpleTable();
 
-    // expect: 'Design Landing Page' row checkbox: checked=false
-    await expect(simplePage.taskCheckbox('Design Landing Page')).not.toBeChecked();
-    // expect: 'Write Blog Post' row checkbox: checked=true
-    await expect(simplePage.taskCheckbox('Write Blog Post')).toBeChecked();
-    // expect: 'Develop API' row checkbox: checked=false
-    await expect(simplePage.taskCheckbox('Develop API')).not.toBeChecked();
+    // expect: 'Design Landing Page' unchecked, 'Write Blog Post' checked, 'Develop API' unchecked
+    await simplePage.expectTaskDefaultState();
   });
 
   test("Salary table renders its 4 rows in original (unsorted) order with all four headers showing aria-sort='none' on fresh load", async () => {
@@ -98,22 +85,15 @@ test.describe('Simple Table - Initial Load and Default State', () => {
     await simplePage.gotoSimpleTable();
 
     // expect: Rows appear in exactly this order
-    const expectedRows = [
-      ['Alice Johnson', 'Engineering', '2022-01-15', '$80000'],
-      ['Bob Smith', 'Marketing', '2020-09-01', '$60000'],
-      ['Charlie Brown', 'HR', '2021-03-12', '$50000'],
-      ['Diana Prince', 'Engineering', '2019-06-25', '$90000'],
-    ];
-    await expect(simplePage.salaryRows).toHaveCount(4);
-    for (let i = 0; i < expectedRows.length; i++) {
-      await expect(simplePage.salaryRows.nth(i).locator('td')).toHaveText(expectedRows[i]);
-    }
+    await expect(simplePage.salaryRows.locator('td')).toHaveText([
+      'Alice Johnson', 'Engineering', '2022-01-15', '$80000',
+      'Bob Smith', 'Marketing', '2020-09-01', '$60000',
+      'Charlie Brown', 'HR', '2021-03-12', '$50000',
+      'Diana Prince', 'Engineering', '2019-06-25', '$90000',
+    ]);
 
     // expect: 'sort-column-name', 'sort-column-department', 'sort-column-hireDate', and 'sort-column-salary' all
     //         have aria-sort exactly equal to the literal string 'none'
-    await simplePage.expectAriaSort('name', 'none');
-    await simplePage.expectAriaSort('department', 'none');
-    await simplePage.expectAriaSort('hireDate', 'none');
-    await simplePage.expectAriaSort('salary', 'none');
+    await simplePage.expectSortState();
   });
 });
