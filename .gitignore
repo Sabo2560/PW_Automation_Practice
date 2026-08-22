@@ -18,6 +18,10 @@ api-discovery-results.json
 # Claude Code local settings (machine-specific, not shared config)
 .claude/settings.local.json
 
+# Claude Code Playwright test agents (planner/generator/healer) — kept local only,
+# not published to the GitHub repo
+.claude/agents/
+
 # Environment variables / secrets — never commit these
 .env
 .env.local
