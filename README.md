@@ -72,7 +72,9 @@ including:
   X > Y, and a nonsensical entries range)
 - Alert component card description incorrectly says "buttons" instead of "alerts"
 - Radio component card's CTA button is labeled "Toggle" instead of matching its actual name
-- Home page has two `<h1>` elements (branding + hero heading), which isn't valid heading hierarchy
+- Home page and `/new-tab-page` (the Window component's "Open New Tab" destination) each have two `<h1>` elements
+  (the shared header's branding link, plus the page's own heading), which isn't valid heading hierarchy — confirmed
+  on both pages so far
 - Multiselect: `#search_input` and `#multiselectContainerReact` are non-unique HTML ids repeated identically
   across all three widget instances on the same page (invalid HTML — confirmed via `querySelectorAll` returning
   3 elements for each id)

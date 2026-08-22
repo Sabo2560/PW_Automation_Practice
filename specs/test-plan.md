@@ -218,9 +218,8 @@ One suite per component, once individually planned:
 | Slider | Drag to value, keyboard arrow adjustment, min/max bounds |
 | Upload File | Upload valid file, upload invalid type/size, remove uploaded file |
 | Drag and Drop | Move item between zones, cancel drop outside target, multiple items |
-| Window | Trigger new window/tab, verify content, verify original window state |
 
-Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`), Dropdown (`specs/dropdown.plan.md`), Multiselect (`specs/multiselect.plan.md`), Radio (`specs/radio.plan.md`), Simple Table (`specs/simple-table.plan.md`), Wait (`specs/wait.plan.md`).
+Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`), Dropdown (`specs/dropdown.plan.md`), Multiselect (`specs/multiselect.plan.md`), Radio (`specs/radio.plan.md`), Simple Table (`specs/simple-table.plan.md`), Wait (`specs/wait.plan.md`), Window (`specs/window.plan.md`).
 
 ## 9. Alert Component (`/components/alert`) — Implemented
 
@@ -268,13 +267,21 @@ Notable quirks confirmed during planning and test implementation (see `specs/cal
 
 Fully planned separately (see linked doc): Calendar (`specs/calendar.plan.md`).
 
-## 15. FAQ Page — Not Yet Planned
+## 15. Window Component (`/components/window`) — Implemented
+
+**Status:** Fully implemented (`tests/components/window/`, 15 scenarios across 7 spec files, all passing across chromium/firefox/webkit). The page presents two independent exercises: "Open New Tab" (a real `target="_blank"` anchor producing genuine new browser tabs) and "Open Modal" (a same-page MUI Modal overlay — despite its name, never a native browser window/tab/popup). All interactions are purely client-side with no backing API calls; the new-tab action is a real page navigation to `/new-tab-page`, not an API call.
+
+Notable quirks confirmed during planning and test implementation (see `specs/window.plan.md` for full detail): both trigger buttons share the identical `data-testid="button-button"`, located instead by accessible role+name; while the modal is open, its backdrop provably intercepts pointer-event hit-testing over the entire viewport (confirmed via `elementFromPoint`) — a real Playwright `.click()` on a background element obscured by the backdrop was confirmed to hang indefinitely rather than fail fast, so the suite uses a deterministic `elementFromPoint` check instead; MUI applies `aria-hidden="true"` to `<main>` for the modal's entire open duration, which makes Playwright's `getByRole()` locators for the two trigger buttons unresolvable unless constructed with `includeHidden: true` (`WindowPage.ts`'s locators account for this); and WebKit does not move focus onto the "Open Modal" button on a mouse click (matching real Safari's default behavior, the same precedented engine difference already documented for the Radio component), so the modal's close-time focus-restoration assertion is WebKit-aware rather than universally strict.
+
+Fully planned separately (see linked doc): Window (`specs/window.plan.md`).
+
+## 16. FAQ Page — Not Yet Planned
 
 - Page loads
 - FAQ items expand/collapse (accordion) if present
 - Content matches expected copy
 
-## 16. API Testing — Not Yet Planned
+## 17. API Testing — Not Yet Planned
 
 No public API docs exist. Before writing API tests:
 1. Open each component page with DevTools → Network tab open.
@@ -289,7 +296,7 @@ For each component with backend interaction (likely: Form, Advanced Table, Uploa
 - Verify UI reflects API response (success/error states)
 - Negative cases: malformed payload, server error simulation via `page.route()` mocking
 
-## 17. Out of Scope
+## 18. Out of Scope
 
 - Payment/donation flow completion on Buy Me a Coffee (external, 3rd-party — home page only verifies the outbound link target, not the checkout flow)
 - Email client behavior (mailto link — home page only verifies the href, does not send mail)

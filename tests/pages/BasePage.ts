@@ -39,4 +39,21 @@ export class BasePage {
     });
     return apiRequests;
   }
+
+  /**
+   * Registers a document-navigation request collector, scoped across the entire browser context
+   * (not just this page) so it also catches requests made by pages opened afterward (e.g. a new
+   * tab) — trackApiRequests() deliberately excludes 'document' resourceType requests and is scoped
+   * to this page alone, so it isn't reusable for this case. Returns the backing array; call before
+   * triggering the navigation so the request isn't missed.
+   */
+  trackDocumentRequests(pathSubstring: string): string[] {
+    const documentRequests: string[] = [];
+    this.page.context().on('request', (request) => {
+      if (request.resourceType() === 'document' && request.url().includes(pathSubstring)) {
+        documentRequests.push(request.url());
+      }
+    });
+    return documentRequests;
+  }
 }
