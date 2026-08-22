@@ -215,7 +215,6 @@ One suite per component, once individually planned:
 
 | Component | Key test cases |
 |---|---|
-| Calendar | Pick date, navigate months/years, disabled dates, range selection if present |
 | Slider | Drag to value, keyboard arrow adjustment, min/max bounds |
 | Upload File | Upload valid file, upload invalid type/size, remove uploaded file |
 | Drag and Drop | Move item between zones, cancel drop outside target, multiple items |
@@ -261,13 +260,21 @@ Notable quirks confirmed during planning and test implementation (see `specs/wai
 
 Fully planned separately (see linked doc): Wait (`specs/wait.plan.md`).
 
-## 14. FAQ Page — Not Yet Planned
+## 14. Calendar Component (`/components/calendar`) — Implemented
+
+**Status:** Fully implemented (`tests/components/calendar/`, 35 scenarios across 10 spec files, all passing across chromium/firefox/webkit). The page presents three independent MUI X Date/Time Pickers exercises: a free-form Basic Date field (fully unconstrained), a Start/End Date range picker (floored at today, dynamically cross-field constrained), and a Select Time picker. All interactions are purely client-side with no backing API calls.
+
+Notable quirks confirmed during planning and test implementation (see `specs/calendar.plan.md` for full detail): selecting a year in year-view immediately commits a new selected date rather than merely navigating; today's cell is marked "today" but is not pre-selected on a fresh popup; and MUI's Popper entrance (Grow) transition satisfies Playwright's `toBeVisible()` well before the popup is actually settled — clicking anything inside a freshly-opened dialog too early can silently miss, reproducible even under serial (`--workers=1`) execution, not merely parallel load. This is handled centrally via `CalendarPage.openDialog()`, used by every dialog-opening call site in the suite, rather than patched per-test.
+
+Fully planned separately (see linked doc): Calendar (`specs/calendar.plan.md`).
+
+## 15. FAQ Page — Not Yet Planned
 
 - Page loads
 - FAQ items expand/collapse (accordion) if present
 - Content matches expected copy
 
-## 15. API Testing — Not Yet Planned
+## 16. API Testing — Not Yet Planned
 
 No public API docs exist. Before writing API tests:
 1. Open each component page with DevTools → Network tab open.
@@ -282,7 +289,7 @@ For each component with backend interaction (likely: Form, Advanced Table, Uploa
 - Verify UI reflects API response (success/error states)
 - Negative cases: malformed payload, server error simulation via `page.route()` mocking
 
-## 16. Out of Scope
+## 17. Out of Scope
 
 - Payment/donation flow completion on Buy Me a Coffee (external, 3rd-party — home page only verifies the outbound link target, not the checkout flow)
 - Email client behavior (mailto link — home page only verifies the href, does not send mail)
