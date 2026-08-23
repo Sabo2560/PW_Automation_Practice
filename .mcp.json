@@ -6,7 +6,10 @@
         "/c",
         "npx",
         "playwright",
-        "run-test-mcp-server"
+        "run-test-mcp-server",
+        "--headless",
+        "--config",
+        "playwright.config.ts"
       ]
     },
     "context7": {
