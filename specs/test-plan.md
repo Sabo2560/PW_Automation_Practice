@@ -215,11 +215,10 @@ One suite per component, once individually planned:
 
 | Component | Key test cases |
 |---|---|
-| Slider | Drag to value, keyboard arrow adjustment, min/max bounds |
 | Upload File | Upload valid file, upload invalid type/size, remove uploaded file |
 | Drag and Drop | Move item between zones, cancel drop outside target, multiple items |
 
-Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`), Dropdown (`specs/dropdown.plan.md`), Multiselect (`specs/multiselect.plan.md`), Radio (`specs/radio.plan.md`), Simple Table (`specs/simple-table.plan.md`), Wait (`specs/wait.plan.md`), Window (`specs/window.plan.md`).
+Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`), Dropdown (`specs/dropdown.plan.md`), Multiselect (`specs/multiselect.plan.md`), Radio (`specs/radio.plan.md`), Simple Table (`specs/simple-table.plan.md`), Wait (`specs/wait.plan.md`), Window (`specs/window.plan.md`), Slider (`specs/slider.plan.md`).
 
 ## 9. Alert Component (`/components/alert`) — Implemented
 
@@ -275,13 +274,21 @@ Notable quirks confirmed during planning and test implementation (see `specs/win
 
 Fully planned separately (see linked doc): Window (`specs/window.plan.md`).
 
-## 16. FAQ Page — Not Yet Planned
+## 16. Slider Component (`/components/slider`) — Implemented
+
+**Status:** Fully implemented (`tests/components/slider/`, 26 scenarios across 8 spec files, all passing across chromium/firefox/webkit). The page presents two independent exercises: a Basic slider (native `<input type="range">`, range 0-100, default 50) and a Min/Max range slider pair (two independent native range inputs, defaults 20/80) enforcing a strict min-less-than-max constraint. All interactions are purely client-side with no backing API calls.
+
+Notable quirks confirmed during planning and test implementation (see `specs/slider.plan.md` for full detail): unlike this repo's MUI-based components, the Slider is confirmed NOT built on MUI (zero `.MuiSlider-root`/`.MuiSlider-thumb` matches anywhere on the page) — all three controls are plain native range inputs, each carrying a globally unique `data-testid`, so unlike Window/Calendar/Radio no duplicate-testid workaround is needed here; the range pair's strict min-less-than-max constraint is enforced differently depending on interaction type — incremental single-step keyboard changes (ArrowRight/ArrowLeft) are permitted to climb right up to the boundary, while large discrete jumps (Home/End/PageUp/PageDown) or track clicks that would violate the constraint are fully rejected with the value left completely unchanged rather than clamped to the nearest valid boundary; and because every slider here is a native, always-full-track-width input rather than a narrow MUI-style thumb element, a default unpositioned `.click()`/`.dragTo()` always lands at the horizontal center of the target element's bounding box (value 50 for a 0-100 range) — `SliderPage.ts` computes exact pixel offsets via `boundingBox()` to reach any other target value. A planned standalone network-request-count scenario (originally 8.2 in the plan) was dropped from implementation per explicit decision, since this component has zero backing API calls of any kind — see `specs/slider.plan.md` §8.2 for the historical record of what was originally planned there.
+
+Fully planned separately (see linked doc): Slider (`specs/slider.plan.md`).
+
+## 17. FAQ Page — Not Yet Planned
 
 - Page loads
 - FAQ items expand/collapse (accordion) if present
 - Content matches expected copy
 
-## 17. API Testing — Not Yet Planned
+## 18. API Testing — Not Yet Planned
 
 No public API docs exist. Before writing API tests:
 1. Open each component page with DevTools → Network tab open.
@@ -296,7 +303,7 @@ For each component with backend interaction (likely: Form, Advanced Table, Uploa
 - Verify UI reflects API response (success/error states)
 - Negative cases: malformed payload, server error simulation via `page.route()` mocking
 
-## 18. Out of Scope
+## 19. Out of Scope
 
 - Payment/donation flow completion on Buy Me a Coffee (external, 3rd-party — home page only verifies the outbound link target, not the checkout flow)
 - Email client behavior (mailto link — home page only verifies the href, does not send mail)
