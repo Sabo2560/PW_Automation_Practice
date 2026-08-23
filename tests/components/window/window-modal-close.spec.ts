@@ -24,9 +24,8 @@ test.describe('Window - Modal Close Mechanisms', () => {
     await windowPage.closeModalViaX();
 
     // expect: document.activeElement is exactly the 'Open Modal' button again (focus restored) —
-    // except on WebKit, which never focuses the button via mouse click in the first place (see
-    // expectClosedStateFullyRestored()'s doc comment; a confirmed WebKit engine difference, not a
-    // bug, matching the same precedent already documented in specs/radio.plan.md).
+    // skipped on WebKit, where this is OS-dependent (see expectClosedStateFullyRestored()'s doc
+    // comment: opposite outcomes confirmed live on local Windows vs. CI's Linux WebKit build).
     // expect: <header> and <main> no longer carry aria-hidden='true' (removed or 'false').
     // expect: document.body's inline style.overflow is reset to its pre-open value (empty string).
     await windowPage.expectClosedStateFullyRestored(browserName);

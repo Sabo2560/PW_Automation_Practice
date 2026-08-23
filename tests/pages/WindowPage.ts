@@ -114,29 +114,27 @@ export class WindowPage extends BasePage {
    * Asserts that, after closing the modal via any of its three close mechanisms (the 'x' button,
    * Escape, or a backdrop click), the pre-open page state has been fully restored: the modal is
    * removed from the DOM, focus has returned to the 'Open Modal' trigger button (chromium/firefox
-   * only — see the `browserName` param doc below for the confirmed WebKit exception), <header>/
-   * <main> no longer carry aria-hidden='true', and document.body's inline style.overflow is reset
-   * to its pre-open (empty string) value. All three close mechanisms are confirmed live
+   * only — see the `browserName` param doc below for the WebKit exception), <header>/<main> no
+   * longer carry aria-hidden='true', and document.body's inline style.overflow is reset to its
+   * pre-open (empty string) value. All three close mechanisms are confirmed live
    * (specs/window.plan.md §4) to restore identical state, so this single helper is shared by each
    * corresponding close-mechanism test rather than repeating the same assertion block three times.
    *
-   * @param browserName When `'webkit'`, the focus-restoration assertion is skipped. Confirmed
-   * live via a 1.8s/6-poll check that this is not a timing race: after close, WebKit's
-   * `document.activeElement` is `<body>`, never the trigger button, at any point. Root cause:
-   * WebKit does not move focus onto button-type elements on a mouse click by default (matches
-   * real Safari's default behavior — the same precedented engine difference already documented
-   * and skipped in specs/radio.plan.md / tests/components/radio/radio-keyboard.spec.ts). Since
-   * the 'Open Modal' button therefore never actually became `document.activeElement` when
-   * clicked, MUI's own close-time focus restoration (which restores focus to whatever was
-   * previously active) correctly restores focus to `<body>` in WebKit — this is a genuine
-   * browser-engine difference, not an application bug, so only this one assertion is skipped on
-   * WebKit while the other 3 checks below remain strict on all 3 browsers.
+   * @param browserName When `'webkit'`, the focus-restoration assertion is skipped entirely rather
+   * than asserted either way. WebKit's focus-on-click behavior for buttons is OS-dependent, not
+   * just engine-dependent: local Windows Playwright WebKit was confirmed live to never focus the
+   * button on click (document.activeElement stayed `<body>` throughout, a 1.8s/6-poll check ruled
+   * out a timing race) — but CI's Linux WebKit build was confirmed, deterministically across
+   * multiple runs and retries, to focus the button instead (the exact opposite outcome from the
+   * same test code). Since this genuinely differs by environment, not just by engine, no single
+   * expected state is portable — asserting either specific state is a real, recurring CI-failure
+   * risk, unlike the analogous WebKit skip in specs/radio.plan.md (that one is a stable per-engine
+   * difference, not one that flips by OS). The other 3 checks below remain strict on all 3
+   * browsers since they don't depend on this platform-specific quirk.
    */
   async expectClosedStateFullyRestored(browserName?: string) {
     await expect(this.modal).toHaveCount(0);
-    if (browserName === 'webkit') {
-      await expect(this.openModalButton).not.toBeFocused();
-    } else {
+    if (browserName !== 'webkit') {
       await expect(this.openModalButton).toBeFocused();
     }
     await expect(this.header).not.toHaveAttribute('aria-hidden', 'true');
