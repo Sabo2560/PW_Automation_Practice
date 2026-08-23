@@ -319,9 +319,11 @@
 
 **Seed:** `tests/seed.spec.ts`
 
-#### 8.1. 8.1. No console errors are logged during extensive interaction with either exercise — Priority: Medium
+#### 8.1. [DROPPED — not implemented] 8.1. No console errors are logged during extensive interaction with either exercise — Priority: Medium
 
-**File:** `tests/components/slider/slider-console.spec.ts`
+Dropped from implementation per explicit product decision (the file was removed after initial implementation). No console-error test is maintained for this component.
+
+**File (removed):** `tests/components/slider/slider-console.spec.ts`
 
 **Steps:**
   1. Navigate to '/components/slider', begin tracking console errors, then perform a broad interaction sequence: all keyboard keys on the basic slider (Arrow x4, Home, End, PageUp, PageDown), a click and a drag on the basic slider, and enough min/max slider ArrowRight/ArrowLeft presses on the range pair to trigger the constraint-rejection boundary at least twice (once from each side)
@@ -329,9 +331,9 @@
 
 #### 8.2. [DROPPED — not implemented] 8.2. No XHR/fetch network requests fire as a result of any slider interaction (purely client-side component) — Priority: Medium
 
-Dropped from implementation per explicit product decision: this component has zero backing API calls of any kind (confirmed via browser_network_requests during planning — see Application Overview), so a standalone network-request-count test was judged to add no value beyond what's already established. The console-errors scenario (8.1) remains implemented.
+Dropped from implementation per explicit product decision: this component has zero backing API calls of any kind (confirmed via browser_network_requests during planning — see Application Overview), so a standalone network-request-count test was judged to add no value beyond what's already established.
 
-**File:** `tests/components/slider/slider-network-console.spec.ts`
+**File (removed):** `tests/components/slider/slider-network-console.spec.ts`
 
 **Steps:**
   1. Navigate to '/components/slider', begin recording network requests, then interact broadly across both exercises (keyboard, click, and drag on the basic slider; boundary-testing keyboard presses on both range sliders)

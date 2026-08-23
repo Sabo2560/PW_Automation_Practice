@@ -80,6 +80,10 @@ including:
   3 elements for each id)
 - Radio: `id="Yes"` and `id="No"` are each used twice document-wide (once in the "answer-radio" group, once in
   "one-radio") — a duplicate-id defect that also breaks accessible names for both groups
+- Drag and Drop: the file widget's `drop-zone` does not validate the identity of the item actually dropped on it —
+  dragging an unrelated Kanban task card onto it still transitions it to the "Uploading..." state with a Reset
+  button AND removes the unrelated file icon from the DOM, exactly as if the file itself had been dropped (broken
+  interaction, confirmed live and re-verified via two independent drag mechanisms)
 
 ## CI/CD
 
