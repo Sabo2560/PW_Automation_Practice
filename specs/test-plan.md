@@ -215,13 +215,13 @@ All specs run on push/PR via the existing GitHub Actions workflow (`.github/work
 
 This spec lives at the top level of `tests/` (not under `tests/components/`) and has no dedicated `specs/<name>.plan.md`, since it is a cross-page check rather than a single-component plan.
 
-## 8. Component Pages — Not Yet Planned
+## 8. Upload File Component (`/components/uploadFile`) — Implemented
 
-One suite per component, once individually planned. Every component except the one below now has a dedicated numbered section (see §9–§23):
+**Status:** Fully implemented (`tests/components/upload-file/`, 16 scenarios across 8 spec files, all passing across chromium/firefox/webkit). The page presents a single click-to-browse file-upload widget: a native, visually-hidden `input[type=file]` (`accept=".txt"`, no `multiple`) triggered by a visible "Upload file" button; a successful `.txt` upload swaps the button + input entirely for a file icon, the filename, and a "Remove file" button. This is a fully separate, simpler component from the drag-and-drop file widget on `/components/dragAndDrop` (no `drop-zone`/`file` testids or `draggable` elements exist on this page at all). All interactions are purely client-side with no backing API calls — the on-page disclaimer "No file is sent to server, everything stays in your browser" was directly confirmed accurate via network monitoring, falsifying this table's own prior "likely backend interaction" guess.
 
-| Component | Key test cases |
-|---|---|
-| Upload File | Upload valid file, upload invalid type/size, remove uploaded file |
+Notable quirks confirmed during planning and test implementation (see `specs/upload-file.plan.md` for full detail): the real route is the camelCase `/components/uploadFile` — the hyphenated `/components/upload-file` 404s; **[QUIRK, tracked in README's known-findings list]** the `.txt` extension check is case-sensitive and exact — an uppercase `UPPER-TEST.TXT` is rejected with the identical "Only .txt files are allowed." alert as a wholly wrong file type, so only a literal lowercase `.txt` suffix is ever accepted; no file-size limit of any kind exists (only the filename extension is validated — a 0-byte file uploads successfully); and rejecting an invalid file resets the underlying input's `files`/`value` to empty even though the visible UI never changes, allowing the same invalid file to be re-selected and re-rejected repeatably. A generator pass initially shipped `UploadFilePage.getUploadedFileName()` reading only `icon.nextSibling`, which returned `''` instead of the filename in all 3 browsers (12 failures) — live DOM inspection during healing found the filename actually sits behind an extra whitespace-only text node sibling; the healer fixed the helper to concatenate all direct text-node children of the icon's parent instead of assuming a single sibling. A cleanup pass afterward added the plan's originally-specified `expectDefaultState()`/`expectUploadedState()` Page Object helpers (not implemented during initial generation) and consolidated the same repeated 3-4-assertion state checks that had been duplicated inline across four spec files.
+
+Fully planned separately (see linked doc): Upload File (`specs/upload-file.plan.md`).
 
 ## 9. Advanced Table Component (`/components/advanced-table`) — Implemented
 
@@ -356,7 +356,7 @@ No public API docs exist. Before writing API tests:
 4. Alternatively, use Playwright's `page.on('request')` / `page.route()` in a throwaway script against each page to log calls automatically.
 5. Update this doc's API section once endpoints are confirmed.
 
-For each component with backend interaction (likely: Form, Advanced Table, Upload File):
+For each component with backend interaction (likely: Form, Advanced Table — Upload File was directly confirmed purely client-side during its own planning pass, see §8, and needs no API-level coverage):
 - Verify request method, URL, headers, payload shape
 - Verify response status code and body schema
 - Verify UI reflects API response (success/error states)
