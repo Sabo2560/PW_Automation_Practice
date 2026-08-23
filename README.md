@@ -44,11 +44,13 @@ npx playwright show-report
 ```
 tests/
   components/           # one directory per component (Input, Button, Dropdown, Multiselect, ...),
-                         # each with several spec files split by concern (load, selection, keyboard, ...)
+                         # each with several spec files split by concern (load, selection, keyboard, ...);
+                         # also includes components-listing/ (the /components page itself: card integrity,
+                         # filters, and the cross-page "walk every component card and back" check)
   pages/                 # Page Object Model — one class per component (extends BasePage.ts),
                          # exposing locators/helpers so spec files don't scatter raw page.locator() calls
   home/                  # home page coverage (branding, navigation, responsive, a11y)
-  componentsnavigation.spec.ts   # cross-page: walks every component card and back
+  faq/                   # FAQ page coverage (load, toggle, content, network, persistence)
   seed.spec.ts
 
 scripts/
