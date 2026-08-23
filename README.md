@@ -84,6 +84,11 @@ including:
   dragging an unrelated Kanban task card onto it still transitions it to the "Uploading..." state with a Reset
   button AND removes the unrelated file icon from the DOM, exactly as if the file itself had been dropped (broken
   interaction, confirmed live and re-verified via two independent drag mechanisms)
+- Dropdown: once a real option is selected in the fruit single-select, that specific `<option>` element gains a
+  `hidden` HTML attribute it did not have before selection — a real mouse user who reopens the native dropdown
+  afterward cannot see or re-click that same already-selected option in the rendered list (broken interaction;
+  the underlying value remains correct and Playwright's `selectOption()` can still re-select it programmatically,
+  since that API operates on the DOM value directly rather than simulating a real click on a rendered option)
 
 ## CI/CD
 

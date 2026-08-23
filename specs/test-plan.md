@@ -203,29 +203,81 @@ All specs run on push/PR via the existing GitHub Actions workflow (`.github/work
 
 ---
 
-## 7. Components Listing Page (`/components`) — Not Yet Planned
+## 7. Components Listing Page (`/components`) — Partially Covered
 
-- All 16 component cards render (name + description + link)
-- Difficulty/Type filters (if functional) filter the list correctly
-- Each card link navigates to correct component page
+**Status:** Partially covered. `tests/componentsnavigation.spec.ts` implements 1 comprehensive scenario that reads every component card's href directly off the live page (so it does not need updating as components are added), then walks into each of the 16+ component pages and back via the header "BACK" button, verifying the URL changes correctly on both legs of the round trip — each component's card-to-page navigation is wrapped in its own `test.step()` so the HTML report shows per-component pass/fail rather than one opaque pass/fail for the whole loop.
+
+- [x] Each card link navigates to the correct component page, and back — covered by `tests/componentsnavigation.spec.ts`
+- [ ] All 16 component cards render with correct name + description + link — not yet planned
+- [ ] Difficulty/Type filters (if functional) filter the list correctly — not yet planned
+
+**Seed:** `tests/seed.spec.ts`
+
+This spec lives at the top level of `tests/` (not under `tests/components/`) and has no dedicated `specs/<name>.plan.md`, since it is a cross-page check rather than a single-component plan.
 
 ## 8. Component Pages — Not Yet Planned
 
-One suite per component, once individually planned:
+One suite per component, once individually planned. Every component except the one below now has a dedicated numbered section (see §9–§23):
 
 | Component | Key test cases |
 |---|---|
 | Upload File | Upload valid file, upload invalid type/size, remove uploaded file |
 
-Fully planned separately (see linked docs): Advanced Table (`specs/advanced-table.plan.md`), Form (`specs/form.plan.md`), Input (`specs/input.plan.md`), Button (`specs/button.plan.md`), Alert (`specs/alert.plan.md`), Drag (`specs/drag.plan.md`), Drag and Drop (`specs/drag-and-drop.plan.md`), Dropdown (`specs/dropdown.plan.md`), Multiselect (`specs/multiselect.plan.md`), Radio (`specs/radio.plan.md`), Simple Table (`specs/simple-table.plan.md`), Wait (`specs/wait.plan.md`), Window (`specs/window.plan.md`), Slider (`specs/slider.plan.md`).
+## 9. Advanced Table Component (`/components/advanced-table`) — Implemented
 
-## 9. Alert Component (`/components/alert`) — Implemented
+**Status:** Implemented (`tests/components/advanced-table/`, 21 scenarios across 5 spec files). The page presents a paginated, searchable, client-side-only table of 64 university records (columns ID, Name, Country, Website) with a page-size selector (5/10/25) and First/Previous/Next/Last pagination controls.
+
+Notable quirks confirmed during planning (see `specs/advanced-table.plan.md` for full detail): **[BUG]** changing the page size while on a page number that doesn't exist at the new size does not clamp the page number, producing an invalid state (e.g. page indicator "7 / 3" with a nonsensical "Showing 151 to 64 of 64 entries" summary and zero rendered rows) until "First" is clicked to recover — this is tracked in README's known-findings list; an empty search result's Next/Previous button enabled/disabled state is also inconsistent immediately after the first click on that empty state; and whitespace-only search input is treated as an active filter in the results summary text even though it matches all 64 records identically to no filter at all (cosmetic messaging quirk only).
+
+Fully planned separately (see linked doc): Advanced Table (`specs/advanced-table.plan.md`).
+
+## 10. Button Component (`/components/button`) — Implemented
+
+**Status:** Implemented (`tests/components/button/`, 12 scenarios across 5 spec files). The page presents six independent buttons: "Go Home" (same-tab navigation), three "invisible-result" informational buttons (Find Location, Find Color, Find Height & Width — verified by reading the button's own properties rather than any displayed feedback), a disabled button, and a "Click and Hold" timer button. All interactions are purely client-side with no backing API calls.
+
+Notable quirks confirmed during planning (see `specs/button.plan.md` for full detail): **[GAP — accessibility]** the Click and Hold button's hold-tracking is implemented purely via mouse events (`mousedown`/`mouseup`/`mouseleave`) with no keyboard equivalent — holding Enter down produces no "Holding..." state and no result text at all; and moving the mouse off the button while still pressed ends the hold immediately via `mouseleave` (using the elapsed time at that moment), rather than continuing to track until the eventual real `mouseup`, which may occur later and/or elsewhere on the page.
+
+Fully planned separately (see linked doc): Button (`specs/button.plan.md`).
+
+## 11. Drag Component (`/components/drag`) — Implemented
+
+**Status:** Implemented (`tests/components/drag/`, 14 scenarios across 5 spec files). The page presents a single exercise: a 64x64px draggable box confined to a 384x320px dashed-border container, positioned via a CSS `transform: translate(Xpx, Ypx)` on its inline style, with independent boundary clamping confirmed exactly at all four corners. All interactions are purely client-side with no backing API calls.
+
+Notable quirks confirmed during planning (see `specs/drag.plan.md` for full detail): **[GAP — accessibility]** the draggable box has no keyboard equivalent to the mouse-drag interaction — it cannot be given programmatic focus, has no `tabindex`, and arrow keys produce no movement at all; and neither the container nor the draggable box carries any `data-testid` (the page's only testid belongs to an unrelated label), so all locators in `DragPage.ts` rely on Tailwind CSS class selectors, a more brittle pattern than the testid-based locators used elsewhere in this suite.
+
+Fully planned separately (see linked doc): Drag (`specs/drag.plan.md`).
+
+## 12. Dropdown Component (`/components/dropdown`) — Implemented
+
+**Status:** Implemented (`tests/components/dropdown/`, 23 scenarios across 8 spec files). The page presents four independent native `<select>` exercises: a single-select fruit dropdown (selected by visible label), a multi-select superhero dropdown (10 options), a single-select programming-language dropdown (selected by an underlying value distinct from its visible label), and a single-select country dropdown (value equals label). All interactions are purely client-side with no backing API calls.
+
+Notable quirks confirmed during planning (see `specs/dropdown.plan.md` for full detail): **[QUIRK, tracked in README's known-findings list]** once a real option is selected in the fruit single-select, that specific `<option>` element gains a `hidden` HTML attribute it did not have before selection — a real mouse user who reopens the native dropdown afterward cannot see or re-click that same already-selected option in the rendered list (the value remains correctly selected, and Playwright's `selectOption()` can still re-select it programmatically since it operates on the DOM value directly); and the multi-select's result text always lists selected heroes in the select's own DOM/option order, never the order they were selected in.
+
+Fully planned separately (see linked doc): Dropdown (`specs/dropdown.plan.md`).
+
+## 13. Form Component (`/components/form`) — Implemented
+
+**Status:** Implemented (`tests/components/form/`, 15 scenarios across 4 spec files). The page presents a single native `<form>` with six fields (dropdown, name, email, message, radio group, checkbox) validated entirely via native HTML5 `required` constraint validation — no custom JS validation and no app-rendered inline error text exist anywhere on the page. Successful submission swaps the form for a client-side-only success panel with a "Retry" button that fully resets every field to its fresh-load default.
+
+Notable quirks confirmed during planning (see `specs/form.plan.md` for full detail): **[GAP]** the Email field has no email-format validation whatsoever (its `type` is plain `text`, no `pattern` attribute), so an obviously-invalid string like "notanemail" is accepted as a fully valid submission; **[GAP]** whitespace-only input in any required text field (Name, Email, Message) satisfies the native `required` constraint and allows successful submission, since HTML5 `required` does not trim/check for whitespace-only content; and all captured native `validationMessage` strings were observed in a French-locale browser session, so scenarios assert on validity state and page state rather than hardcoding those exact strings.
+
+Fully planned separately (see linked doc): Form (`specs/form.plan.md`).
+
+## 14. Input Component (`/components/input`) — Implemented
+
+**Status:** Implemented (`tests/components/input/`, 9 scenarios across 3 spec files). The page presents six independent, unrelated `<input type="text">` fields outside any `<form>`, each demonstrating a different input-handling behavior: an empty required field, two pre-filled editable fields, a pre-filled field meant to be cleared, a disabled field, and a readonly field.
+
+Notable quirks confirmed during planning (see `specs/input.plan.md` for full detail): none of the six fields declares any format/length constraint (`maxlength`/`pattern`) beyond `required`, consistent with the same site-wide "native `required`-only" validation pattern documented on the Form component's Email field; whitespace-only input satisfies the `required` constraint on the empty field, the same native-browser edge case documented for Form; and the disabled field is confirmed excluded from keyboard tab order while the readonly field remains focusable but rejects value mutation via typing.
+
+Fully planned separately (see linked doc): Input (`specs/input.plan.md`).
+
+## 15. Alert Component (`/components/alert`) — Implemented
 
 **Status:** Fully implemented (`tests/components/alert/`, 13 scenarios, all passing across chromium/firefox/webkit). The component presents four independent dialog-trigger buttons (native `alert()`, `confirm()`, `prompt()`, and a custom SweetAlert2 modal), all purely client-side with no backing API calls.
 
 Fully planned separately (see linked doc): Alert (`specs/alert.plan.md`).
 
-## 10. Multiselect Component (`/components/multiselect`) — Implemented
+## 16. Multiselect Component (`/components/multiselect`) — Implemented
 
 **Status:** Fully implemented (`tests/components/multiselect/`, 20 scenarios across 7 spec files, all passing across chromium/firefox/webkit). The page presents three independent instances of a searchable, chip-based multi-select widget (`multiselect-react-dropdown`): Form 1 (10 options, starts empty), Form 2 (3 options, starts empty — used to exercise the "all options selected" empty state), and Form 3 (10 options, starts with two pre-selected chips). All interactions are purely client-side with no backing API calls.
 
@@ -233,7 +285,7 @@ Notable quirks confirmed during planning (see `specs/multiselect.plan.md` for fu
 
 Fully planned separately (see linked doc): Multiselect (`specs/multiselect.plan.md`).
 
-## 11. Radio Component (`/components/radio`) — Implemented
+## 17. Radio Component (`/components/radio`) — Implemented
 
 **Status:** Fully implemented (`tests/components/radio/`, 20 scenarios across 8 spec files, 56 passing + 1 correctly skipped across chromium/firefox/webkit — the skip is a genuine WebKit engine limitation, not a gap in coverage). The page presents seven independent exercises: two structurally-identical boolean radio groups, a deliberately-buggy "Find the bug" pair with mismatched `name` attributes, a pre-selected Foo/Bar group, a group with a disabled option, and two standalone checkboxes (one with a nested link). All interactions are purely client-side with no backing API calls.
 
@@ -241,7 +293,7 @@ Notable findings confirmed during planning (see `specs/radio.plan.md` for full d
 
 Fully planned separately (see linked doc): Radio (`specs/radio.plan.md`).
 
-## 12. Simple Table Component (`/components/simple-table`) — Implemented
+## 18. Simple Table Component (`/components/simple-table`) — Implemented
 
 **Status:** Fully implemented (`tests/components/simple-table/`, 20 scenarios across 7 spec files, all passing across chromium/firefox/webkit). The page presents three independent tables: a shopping table with a computed total, a task table with independent checkboxes, and a sortable salary table (four columns, descending-first on each column's initial click).
 
@@ -249,7 +301,7 @@ Notable quirks confirmed during planning (see `specs/simple-table.plan.md` for f
 
 Fully planned separately (see linked doc): Simple Table (`specs/simple-table.plan.md`).
 
-## 13. Wait Component (`/components/wait`) — Implemented
+## 19. Wait Component (`/components/wait`) — Implemented
 
 **Status:** Fully implemented (`tests/components/wait/`, 21 scenarios across 9 spec files, all passing across chromium/firefox/webkit). The page presents four independent asynchronous exercises, each driven by a randomized client-side delay (~2.1s-4.0s observed): a native `alert()` dialog, an element that appears, text that changes, and an element that appears near-instantly then disappears again after a further random delay.
 
@@ -257,7 +309,7 @@ Notable quirks confirmed during planning and test implementation (see `specs/wai
 
 Fully planned separately (see linked doc): Wait (`specs/wait.plan.md`).
 
-## 14. Calendar Component (`/components/calendar`) — Implemented
+## 20. Calendar Component (`/components/calendar`) — Implemented
 
 **Status:** Fully implemented (`tests/components/calendar/`, 35 scenarios across 10 spec files, all passing across chromium/firefox/webkit). The page presents three independent MUI X Date/Time Pickers exercises: a free-form Basic Date field (fully unconstrained), a Start/End Date range picker (floored at today, dynamically cross-field constrained), and a Select Time picker. All interactions are purely client-side with no backing API calls.
 
@@ -265,7 +317,7 @@ Notable quirks confirmed during planning and test implementation (see `specs/cal
 
 Fully planned separately (see linked doc): Calendar (`specs/calendar.plan.md`).
 
-## 15. Window Component (`/components/window`) — Implemented
+## 21. Window Component (`/components/window`) — Implemented
 
 **Status:** Fully implemented (`tests/components/window/`, 15 scenarios across 7 spec files, all passing across chromium/firefox/webkit). The page presents two independent exercises: "Open New Tab" (a real `target="_blank"` anchor producing genuine new browser tabs) and "Open Modal" (a same-page MUI Modal overlay — despite its name, never a native browser window/tab/popup). All interactions are purely client-side with no backing API calls; the new-tab action is a real page navigation to `/new-tab-page`, not an API call.
 
@@ -273,7 +325,7 @@ Notable quirks confirmed during planning and test implementation (see `specs/win
 
 Fully planned separately (see linked doc): Window (`specs/window.plan.md`).
 
-## 16. Slider Component (`/components/slider`) — Implemented
+## 22. Slider Component (`/components/slider`) — Implemented
 
 **Status:** Fully implemented (`tests/components/slider/`, 25 scenarios across 7 spec files, all passing across chromium/firefox/webkit — the plan's console-errors and network-requests scenarios were both dropped from implementation, see `specs/slider.plan.md` §8). The page presents two independent exercises: a Basic slider (native `<input type="range">`, range 0-100, default 50) and a Min/Max range slider pair (two independent native range inputs, defaults 20/80) enforcing a strict min-less-than-max constraint. All interactions are purely client-side with no backing API calls.
 
@@ -281,7 +333,7 @@ Notable quirks confirmed during planning and test implementation (see `specs/sli
 
 Fully planned separately (see linked doc): Slider (`specs/slider.plan.md`).
 
-## 17. Drag and Drop Component (`/components/dragAndDrop`) — Implemented
+## 23. Drag and Drop Component (`/components/dragAndDrop`) — Implemented
 
 **Status:** Fully implemented (`tests/components/drag-and-drop/`, 15 scenarios across 7 spec files, all passing across chromium/firefox/webkit). The page presents two independent widgets built on the browser's native HTML5 drag-and-drop API (`draggable="true"` + `dragstart`/`dragover`/`drop`), explicitly distinct from the mouse-transform dragging used by the separate `/components/drag` component: (1) a 2-column Kanban task board ("To Do"/"Finished") holding 4 task cards, and (2) a single file-icon-to-drop-zone widget with an Uploading/Reset lifecycle. All interactions are purely client-side with no backing API calls.
 
@@ -289,13 +341,13 @@ Notable quirks confirmed during planning and test implementation (see `specs/dra
 
 Fully planned separately (see linked doc): Drag and Drop (`specs/drag-and-drop.plan.md`).
 
-## 18. FAQ Page — Not Yet Planned
+## 24. FAQ Page — Not Yet Planned
 
 - Page loads
 - FAQ items expand/collapse (accordion) if present
 - Content matches expected copy
 
-## 19. API Testing — Not Yet Planned
+## 25. API Testing — Not Yet Planned
 
 No public API docs exist. Before writing API tests:
 1. Open each component page with DevTools → Network tab open.
@@ -310,7 +362,7 @@ For each component with backend interaction (likely: Form, Advanced Table, Uploa
 - Verify UI reflects API response (success/error states)
 - Negative cases: malformed payload, server error simulation via `page.route()` mocking
 
-## 20. Out of Scope
+## 26. Out of Scope
 
 - Payment/donation flow completion on Buy Me a Coffee (external, 3rd-party — home page only verifies the outbound link target, not the checkout flow)
 - Email client behavior (mailto link — home page only verifies the href, does not send mail)
