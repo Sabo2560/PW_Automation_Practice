@@ -167,6 +167,15 @@ export class CalendarPage extends BasePage {
         await this.previousMonthButton(dialog).click();
       }
     }
+
+    // The header label settles one step ahead of the day-grid: MUI's grid slide-in
+    // keeps the outgoing month's grid mounted alongside the incoming one for the
+    // duration of the animation, so a day cell read immediately after this loop can
+    // transiently resolve to two elements sharing the same day number (same
+    // strict-mode violation guarded in selectDateViaPicker). Day 15 exists in every
+    // month — wait for exactly one before returning so direct cell reads by callers
+    // (e.g. the min/max boundary specs' disabled-day loops) are safe.
+    await expect(dialog.getByRole('gridcell', { name: '15', exact: true })).toHaveCount(1);
   }
 
   /**

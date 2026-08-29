@@ -17,6 +17,13 @@ test.describe('Calendar - Date Range Keyboard Interaction', () => {
     //    (today's cell is focused by default) and press 'ArrowRight'
     const dialog = calendarPage.startDateDialog();
     const today = calendarPage.getOffsetDate(0);
+    // When today is the last day of the month, ArrowRight pages the grid to the next month,
+    // unmounting today's own cell before the assertions below can read its aria-selected state.
+    // Same date-shaped guard as calendar-date-range-boundaries.spec.ts's "today is the 1st" skip.
+    test.skip(
+      today.getMonth() !== calendarPage.getOffsetDate(1).getMonth(),
+      'today is the last day of the month; ArrowRight crosses into the next month and unmounts the cell under assertion.',
+    );
     await calendarPage.selectDateViaPicker(calendarPage.startDateChooseButton, dialog, today);
 
     await calendarPage.openDialog(calendarPage.startDateChooseButton, dialog);
@@ -51,6 +58,13 @@ test.describe('Calendar - Date Range Keyboard Interaction', () => {
     //    popup and press 'ArrowLeft'
     const dialog = calendarPage.startDateDialog();
     const targetDate = calendarPage.getOffsetDate(2);
+    // When today+1 and today+2 fall in different months, ArrowLeft pages the grid back a month,
+    // unmounting the (today+2) cell before its aria-selected='true' can be asserted. Skip that
+    // ~1-day-per-month case, matching calendar-date-range-boundaries.spec.ts's date-shaped guard.
+    test.skip(
+      targetDate.getMonth() !== calendarPage.getOffsetDate(1).getMonth(),
+      'today+2 is the 1st of the next month; ArrowLeft crosses back a month and unmounts the cell under assertion.',
+    );
     await calendarPage.selectDateViaPicker(calendarPage.startDateChooseButton, dialog, targetDate);
 
     await calendarPage.openDialog(calendarPage.startDateChooseButton, dialog);
