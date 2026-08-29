@@ -1,0 +1,263 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  schedule:
+    # Runs daily at 06:00 UTC. GitHub Actions cron is always UTC —
+    # adjust the hour if you want it to land at a specific local time.
+    - cron: '0 6 * * *'
+  workflow_dispatch: # lets you also trigger it manually from the Actions tab
+
+# One in-progress run per ref; a new push to a PR cancels the superseded run.
+# push/schedule runs on main are left to finish so history stays complete.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# The suite is ~1000 tests x 3 browsers. Run as one job it serialised into a
+# single ~50-minute block. It's split here into feature-area jobs that run in
+# parallel, each with its own chromium/firefox/webkit matrix, so a run finishes
+# in the time of its slowest area (~15 min) and a failure points straight at the
+# area that broke. Every job is safe on push/PR: the practice site is entirely
+# client-side (form submits fire no network request), so there is no live-site
+# state to protect and nothing to gate behind the schedule.
+#
+# Each job repeats the same setup block (checkout, npm ci, browser cache +
+# install). GitHub Actions has no YAML anchors, so the duplication is the price
+# of keeping this in one readable file. To add an area, copy a job and swap the
+# `name`, the test paths, and the artifact name.
+
+jobs:
+  # tests/home (4) + tests/faq (5) + tests/seed.spec.ts (1)
+  home:
+    name: home
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: npm
+    - name: Install dependencies
+      run: npm ci
+    # Caches the downloaded browser binaries (not the OS-level apt packages
+    # --with-deps also installs — those can't persist across runs, fresh VM each
+    # time) so a cache hit skips re-downloading Chromium/Firefox/WebKit.
+    - name: Cache Playwright browser binaries
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    # --with-deps is required for WebKit specifically — ubuntu-latest doesn't ship
+    # its GTK4/GStreamer/flite libraries, and dropping this flag once already broke
+    # every WebKit test in CI (~30 missing .so files). --with-deps shells out to
+    # `apt-get update`, which occasionally hangs on a degraded Ubuntu mirror, so
+    # it's wrapped in a retry instead of riding out the full job timeout. Only the
+    # matrix browser is installed per job.
+    - name: Install Playwright Browsers
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 10
+        max_attempts: 3
+        command: npx playwright install --with-deps ${{ matrix.browser }}
+    - name: Run home suite (Home, FAQ, seed)
+      run: npx playwright test tests/home tests/faq tests/seed.spec.ts --project=${{ matrix.browser }} --workers=2
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report-home-${{ matrix.browser }}
+        path: playwright-report/
+        retention-days: 30
+
+  # form (4) + input (3) + dropdown (8) + multiselect (7) + radio (9)
+  forms:
+    name: forms
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: npm
+    - name: Install dependencies
+      run: npm ci
+    - name: Cache Playwright browser binaries
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    - name: Install Playwright Browsers
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 10
+        max_attempts: 3
+        command: npx playwright install --with-deps ${{ matrix.browser }}
+    - name: Run forms suite (form, input, dropdown, multiselect, radio)
+      run: npx playwright test tests/components/form tests/components/input tests/components/dropdown tests/components/multiselect tests/components/radio --project=${{ matrix.browser }} --workers=2
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report-forms-${{ matrix.browser }}
+        path: playwright-report/
+        retention-days: 30
+
+  # button (5) + slider (8) + drag (5) + drag-and-drop (7)
+  controls:
+    name: controls
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: npm
+    - name: Install dependencies
+      run: npm ci
+    - name: Cache Playwright browser binaries
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    - name: Install Playwright Browsers
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 10
+        max_attempts: 3
+        command: npx playwright install --with-deps ${{ matrix.browser }}
+    - name: Run controls suite (button, slider, drag, drag-and-drop)
+      run: npx playwright test tests/components/button tests/components/slider tests/components/drag tests/components/drag-and-drop --project=${{ matrix.browser }} --workers=2
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report-controls-${{ matrix.browser }}
+        path: playwright-report/
+        retention-days: 30
+
+  # advanced-table (5) + simple-table (7) + components-listing (3)
+  tables:
+    name: tables
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: npm
+    - name: Install dependencies
+      run: npm ci
+    - name: Cache Playwright browser binaries
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    - name: Install Playwright Browsers
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 10
+        max_attempts: 3
+        command: npx playwright install --with-deps ${{ matrix.browser }}
+    - name: Run tables suite (advanced-table, simple-table, components-listing)
+      run: npx playwright test tests/components/advanced-table tests/components/simple-table tests/components/components-listing --project=${{ matrix.browser }} --workers=2
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report-tables-${{ matrix.browser }}
+        path: playwright-report/
+        retention-days: 30
+
+  # calendar (10) + wait (9) + window (7)
+  calendar-wait-window:
+    name: calendar-wait-window
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: npm
+    - name: Install dependencies
+      run: npm ci
+    - name: Cache Playwright browser binaries
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    - name: Install Playwright Browsers
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 10
+        max_attempts: 3
+        command: npx playwright install --with-deps ${{ matrix.browser }}
+    - name: Run calendar/wait/window suite
+      run: npx playwright test tests/components/calendar tests/components/wait tests/components/window --project=${{ matrix.browser }} --workers=2
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report-calendar-wait-window-${{ matrix.browser }}
+        path: playwright-report/
+        retention-days: 30
+
+  # alert (6) + upload-file (8)
+  alert-upload:
+    name: alert-upload
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+        cache: npm
+    - name: Install dependencies
+      run: npm ci
+    - name: Cache Playwright browser binaries
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    - name: Install Playwright Browsers
+      uses: nick-fields/retry@v3
+      with:
+        timeout_minutes: 10
+        max_attempts: 3
+        command: npx playwright install --with-deps ${{ matrix.browser }}
+    - name: Run alert/upload-file suite
+      run: npx playwright test tests/components/alert tests/components/upload-file --project=${{ matrix.browser }} --workers=2
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report-alert-upload-${{ matrix.browser }}
+        path: playwright-report/
+        retention-days: 30
